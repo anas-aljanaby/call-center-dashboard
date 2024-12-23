@@ -1,6 +1,6 @@
 import React from 'react';
 import ConversationTimeline from './components/ConversationTimeline';
-
+import CallDetails from './components/CallDetails';
 
 const dummySegments = [
   {
@@ -249,6 +249,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       <ConversationTimeline segments={dummySegments} duration={duration} />
+      <div className="flex">
+        <CallDetails />
+        <div className="w-1/2">
+          {/* Right half reserved for future component */}
+        </div>
+      </div>
     </div>
   );
 }
