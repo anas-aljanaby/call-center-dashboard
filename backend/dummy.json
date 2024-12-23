@@ -1,1 +1,240 @@
-{"success":true,"data":{"full_text":"Thank you for calling Martha's Flores, town assist you. Hello, I'd like to order flowers and I think you have what I'm looking for. I'd be happy to take care of your order, may have your name please. Randall Thomas. Randall Thomas, can you spell that for me? Randall, R-A-N-D-A-L-L, Thomas. Thank you for that information Randall. May have your home or office number area code first. That's 409-866-5088. Do you have a fax number or email address? My email is RandallThomasatgmail.com RandallThomasatgmail.com May have your shipping address? 6800, Batters Avenue, Fulmont, Texas, lift code 7706 Gladys Avenue Beaumont, Texas ZIP Code 77706. Thank you for the information. What products were you interested in purchasing? Red roses, probably a dozen. One dozen of red roses, do you want long stems? Sure. Alright, Randall, let me process your order. One moment please. Okay. Randomly you're ordering one dozen long-stent red roses. The total amount of your order is $40 and it will be shipped to your address within 24 hours. I was thinking of delivering my roses again. Within 24 hours. Okay, no problem. Is there anything else I can help you with? That's all for now, thanks. No problem, Rana. Thank you for calling Martha's Floor. Have a nice day.","timestamps":[{"word":"Thank","start":0.6,"end":0.96,"conf":0.98},{"word":"you","start":0.98,"end":1.06,"conf":1},{"word":"for","start":1.08,"end":1.2,"conf":0.99},{"word":"calling","start":1.22,"end":1.46,"conf":0.84},{"word":"Martha's","start":1.48,"end":2.06,"conf":0.27},{"word":"Flores,","start":2.08,"end":2.56,"conf":0.25},{"word":"town","start":2.58,"end":2.78,"conf":0.25},{"word":"assist","start":2.8,"end":3.16,"conf":0.33},{"word":"you.","start":3.18,"end":3.92,"conf":0.85},{"word":"Hello,","start":3.94,"end":4.14,"conf":0.97},{"word":"I'd","start":4.14,"end":4.34,"conf":1},{"word":"like","start":4.34,"end":4.5,"conf":1},{"word":"to","start":4.52,"end":4.72,"conf":1},{"word":"order","start":4.74,"end":4.94,"conf":0.89},{"word":"flowers","start":4.96,"end":5.54,"conf":0.66},{"word":"and","start":5.56,"end":5.76,"conf":0.97},{"word":"I","start":5.78,"end":5.98,"conf":0.99},{"word":"think","start":6,"end":6.12,"conf":0.98},{"word":"you","start":6.14,"end":6.3,"conf":0.99},{"word":"have","start":6.32,"end":6.46,"conf":1},{"word":"what","start":6.48,"end":6.62,"conf":0.99},{"word":"I'm","start":6.64,"end":6.78,"conf":1},{"word":"looking","start":6.8,"end":6.98,"conf":1},{"word":"for.","start":7,"end":7.86,"conf":0.99},{"word":"I'd","start":7.9,"end":8.12,"conf":1},{"word":"be","start":8.14,"end":8.18,"conf":1},{"word":"happy","start":8.2,"end":8.36,"conf":0.73},{"word":"to","start":8.38,"end":8.5,"conf":0.99},{"word":"take","start":8.52,"end":8.72,"conf":0.98},{"word":"care","start":8.74,"end":8.86,"conf":0.99},{"word":"of","start":8.88,"end":8.98,"conf":0.99},{"word":"your","start":9,"end":9.1,"conf":1},{"word":"order,","start":9.12,"end":9.48,"conf":0.98},{"word":"may","start":9.5,"end":9.56,"conf":0.5},{"word":"have","start":9.58,"end":9.82,"conf":0.99},{"word":"your","start":9.84,"end":9.98,"conf":0.99},{"word":"name","start":10,"end":10.22,"conf":0.72},{"word":"please.","start":10.22,"end":11.3,"conf":0.64},{"word":"Randall","start":11.3,"end":11.58,"conf":0.89},{"word":"Thomas.","start":11.6,"end":12.22,"conf":0.97},{"word":"Randall","start":12.33,"end":13.17,"conf":0.96},{"word":"Thomas,","start":13.17,"end":13.87,"conf":0.99},{"word":"can","start":13.87,"end":13.91,"conf":1},{"word":"you","start":13.93,"end":14.19,"conf":1},{"word":"spell","start":14.21,"end":14.33,"conf":1},{"word":"that","start":14.35,"end":14.63,"conf":0.93},{"word":"for","start":14.65,"end":14.79,"conf":1},{"word":"me?","start":14.81,"end":15.45,"conf":0.97},{"word":"Randall,","start":15.58,"end":16.6,"conf":0.79},{"word":"R-A-N-D-A-L-L,","start":16.64,"end":19.3,"conf":0.87},{"word":"Thomas.","start":19.69,"end":20.27,"conf":0.67},{"word":"Thank","start":20.47,"end":22.61,"conf":0.97},{"word":"you","start":22.97,"end":23.05,"conf":0.98},{"word":"for","start":23.07,"end":23.19,"conf":0.98},{"word":"that","start":23.21,"end":23.37,"conf":0.97},{"word":"information","start":23.37,"end":23.95,"conf":0.33},{"word":"Randall.","start":23.97,"end":24.47,"conf":0.91},{"word":"May","start":24.47,"end":24.51,"conf":0.94},{"word":"have","start":24.51,"end":24.81,"conf":0.98},{"word":"your","start":24.83,"end":25.03,"conf":0.84},{"word":"home","start":25.05,"end":25.23,"conf":0.98},{"word":"or","start":25.25,"end":25.35,"conf":0.99},{"word":"office","start":25.37,"end":25.75,"conf":0.99},{"word":"number","start":25.77,"end":26.11,"conf":0.94},{"word":"area","start":26.11,"end":26.51,"conf":0.99},{"word":"code","start":26.53,"end":26.75,"conf":0.94},{"word":"first.","start":27.03,"end":33.19,"conf":0.4},{"word":"That's","start":34.42,"end":34.8,"conf":0.87},{"word":"409-866-5088.","start":34.82,"end":38.4,"conf":0.98},{"word":"Do","start":38.42,"end":38.54,"conf":0.96},{"word":"you","start":38.56,"end":38.72,"conf":1},{"word":"have","start":38.72,"end":38.76,"conf":0.72},{"word":"a","start":38.76,"end":38.96,"conf":0.81},{"word":"fax","start":38.96,"end":39.22,"conf":0.99},{"word":"number","start":39.24,"end":39.62,"conf":0.98},{"word":"or","start":39.64,"end":39.74,"conf":0.86},{"word":"email","start":39.76,"end":40.12,"conf":1},{"word":"address?","start":40.14,"end":40.96,"conf":0.94},{"word":"My","start":41.02,"end":41.38,"conf":0.81},{"word":"email","start":41.4,"end":41.76,"conf":0.98},{"word":"is","start":41.78,"end":41.98,"conf":0.53},{"word":"RandallThomasatgmail.com","start":42.9,"end":46.44,"conf":0.74},{"word":"RandallThomasatgmail.com","start":46.71,"end":50.11,"conf":0.45},{"word":"May","start":50.13,"end":50.29,"conf":0.85},{"word":"have","start":50.29,"end":50.59,"conf":0.95},{"word":"your","start":50.61,"end":50.81,"conf":1},{"word":"shipping","start":50.83,"end":51.11,"conf":0.99},{"word":"address?","start":51.13,"end":52.05,"conf":0.72},{"word":"6800,","start":52.07,"end":54.39,"conf":0.18},{"word":"Batters","start":54.49,"end":54.77,"conf":0.96},{"word":"Avenue,","start":54.77,"end":55.83,"conf":0.07},{"word":"Fulmont,","start":56.32,"end":57.24,"conf":0.81},{"word":"Texas,","start":57.74,"end":58.5,"conf":0.09},{"word":"lift","start":58.52,"end":58.52,"conf":0.37},{"word":"code","start":58.54,"end":58.78,"conf":0.41},{"word":"7706","start":58.85,"end":61.19,"conf":0.98},{"word":"Gladys","start":61.37,"end":62.11,"conf":0.96},{"word":"Avenue","start":62.13,"end":62.55,"conf":0.52},{"word":"Beaumont,","start":62.55,"end":63.47,"conf":0.97},{"word":"Texas","start":63.47,"end":63.79,"conf":0.47},{"word":"ZIP","start":63.81,"end":64.29,"conf":0.76},{"word":"Code","start":64.31,"end":64.55,"conf":0.78},{"word":"77706.","start":64.55,"end":67.01,"conf":0.99},{"word":"Thank","start":67.01,"end":67.13,"conf":0.99},{"word":"you","start":67.15,"end":67.23,"conf":1},{"word":"for","start":67.25,"end":67.35,"conf":0.99},{"word":"the","start":67.37,"end":67.53,"conf":0.99},{"word":"information.","start":67.55,"end":68.57,"conf":0.88},{"word":"What","start":68.57,"end":68.63,"conf":0.91},{"word":"products","start":68.65,"end":69.07,"conf":0.69},{"word":"were","start":69.09,"end":69.19,"conf":0.96},{"word":"you","start":69.21,"end":69.35,"conf":0.99},{"word":"interested","start":69.37,"end":69.77,"conf":0.99},{"word":"in","start":69.79,"end":69.99,"conf":0.99},{"word":"purchasing?","start":70.01,"end":71.05,"conf":0.96},{"word":"Red","start":71.31,"end":71.55,"conf":0.55},{"word":"roses,","start":71.57,"end":72.17,"conf":0.99},{"word":"probably","start":72.19,"end":72.49,"conf":0.98},{"word":"a","start":72.51,"end":72.69,"conf":1},{"word":"dozen.","start":72.69,"end":73.39,"conf":0.87},{"word":"One","start":74.11,"end":74.25,"conf":0.99},{"word":"dozen","start":74.27,"end":74.59,"conf":0.99},{"word":"of","start":74.61,"end":74.77,"conf":0.96},{"word":"red","start":74.79,"end":74.97,"conf":1},{"word":"roses,","start":74.99,"end":75.49,"conf":0.99},{"word":"do","start":75.51,"end":75.59,"conf":1},{"word":"you","start":75.59,"end":75.71,"conf":1},{"word":"want","start":75.73,"end":75.91,"conf":0.9},{"word":"long","start":75.93,"end":76.29,"conf":0.83},{"word":"stems?","start":76.31,"end":76.79,"conf":0.37},{"word":"Sure.","start":76.81,"end":77.73,"conf":0.79},{"word":"Alright,","start":77.77,"end":78.49,"conf":0.62},{"word":"Randall,","start":78.51,"end":79.11,"conf":0.99},{"word":"let","start":79.13,"end":79.23,"conf":1},{"word":"me","start":79.23,"end":79.33,"conf":0.72},{"word":"process","start":79.35,"end":79.71,"conf":0.73},{"word":"your","start":79.73,"end":79.85,"conf":0.99},{"word":"order.","start":79.87,"end":80.21,"conf":0.98},{"word":"One","start":80.23,"end":80.37,"conf":0.99},{"word":"moment","start":80.39,"end":80.81,"conf":0.61},{"word":"please.","start":80.83,"end":81.29,"conf":0.64},{"word":"Okay.","start":82.38,"end":83.14,"conf":0.92},{"word":"Randomly","start":84.95,"end":85.67,"conf":0.61},{"word":"you're","start":85.69,"end":85.81,"conf":0.99},{"word":"ordering","start":85.83,"end":86.17,"conf":0.7},{"word":"one","start":86.19,"end":86.65,"conf":0.96},{"word":"dozen","start":86.67,"end":86.99,"conf":0.74},{"word":"long-stent","start":87.01,"end":87.67,"conf":0.84},{"word":"red","start":87.69,"end":88.11,"conf":0.98},{"word":"roses.","start":88.13,"end":88.63,"conf":0.99},{"word":"The","start":88.63,"end":88.69,"conf":1},{"word":"total","start":88.71,"end":88.97,"conf":1},{"word":"amount","start":88.99,"end":89.21,"conf":0.99},{"word":"of","start":89.23,"end":89.33,"conf":0.96},{"word":"your","start":89.35,"end":89.49,"conf":0.98},{"word":"order","start":89.51,"end":89.71,"conf":0.99},{"word":"is","start":89.73,"end":89.83,"conf":0.74},{"word":"$40","start":89.85,"end":90.45,"conf":0.38},{"word":"and","start":90.45,"end":91.19,"conf":0.99},{"word":"it","start":91.21,"end":91.33,"conf":0.99},{"word":"will","start":91.35,"end":91.45,"conf":0.99},{"word":"be","start":91.47,"end":91.65,"conf":1},{"word":"shipped","start":91.67,"end":91.91,"conf":0.99},{"word":"to","start":91.93,"end":92.17,"conf":0.99},{"word":"your","start":92.19,"end":92.33,"conf":0.93},{"word":"address","start":92.35,"end":92.67,"conf":1},{"word":"within","start":92.69,"end":92.89,"conf":1},{"word":"24","start":92.91,"end":93.39,"conf":0.96},{"word":"hours.","start":93.41,"end":94.35,"conf":0.73},{"word":"I","start":94.37,"end":94.47,"conf":0.63},{"word":"was","start":94.49,"end":94.61,"conf":0.59},{"word":"thinking","start":94.63,"end":94.89,"conf":0.67},{"word":"of","start":94.91,"end":94.93,"conf":0.97},{"word":"delivering","start":94.95,"end":95.41,"conf":0.63},{"word":"my","start":95.43,"end":95.61,"conf":0.98},{"word":"roses","start":95.63,"end":95.97,"conf":0.68},{"word":"again.","start":95.99,"end":97.07,"conf":0.89},{"word":"Within","start":97.07,"end":97.17,"conf":1},{"word":"24","start":97.19,"end":97.65,"conf":0.98},{"word":"hours.","start":97.65,"end":98.59,"conf":0.81},{"word":"Okay,","start":98.86,"end":99.18,"conf":1},{"word":"no","start":99.2,"end":99.28,"conf":0.99},{"word":"problem.","start":99.3,"end":100.18,"conf":0.9},{"word":"Is","start":100.41,"end":100.45,"conf":1},{"word":"there","start":100.47,"end":100.55,"conf":1},{"word":"anything","start":100.57,"end":100.77,"conf":1},{"word":"else","start":100.79,"end":101.09,"conf":0.99},{"word":"I","start":101.11,"end":101.21,"conf":0.98},{"word":"can","start":101.23,"end":101.37,"conf":1},{"word":"help","start":101.39,"end":101.53,"conf":1},{"word":"you","start":101.55,"end":101.69,"conf":1},{"word":"with?","start":101.71,"end":102.39,"conf":0.37},{"word":"That's","start":102.62,"end":103.02,"conf":0.99},{"word":"all","start":103.04,"end":103.18,"conf":0.99},{"word":"for","start":103.2,"end":103.32,"conf":1},{"word":"now,","start":103.34,"end":103.76,"conf":0.86},{"word":"thanks.","start":103.76,"end":104.04,"conf":0.95},{"word":"No","start":104.22,"end":104.54,"conf":0.96},{"word":"problem,","start":104.56,"end":105.14,"conf":0.26},{"word":"Rana.","start":105.14,"end":105.48,"conf":0.5},{"word":"Thank","start":105.5,"end":105.62,"conf":0.99},{"word":"you","start":105.64,"end":105.72,"conf":0.99},{"word":"for","start":105.74,"end":105.88,"conf":0.99},{"word":"calling","start":105.9,"end":106.12,"conf":0.89},{"word":"Martha's","start":106.14,"end":106.72,"conf":0.36},{"word":"Floor.","start":106.72,"end":106.98,"conf":0.91},{"word":"Have","start":107,"end":107.18,"conf":1},{"word":"a","start":107.2,"end":107.3,"conf":1},{"word":"nice","start":107.32,"end":107.54,"conf":1},{"word":"day.","start":107.56,"end":108.14,"conf":0.71}],"job_id":"17a70bd2-72be-4339-96b1-8a0d162cf9e5"}}
+[
+    {
+        "startTime": 0.8184375,
+        "endTime": 3.4171875,
+        "text": "Thank you for calling Martha's Flores, town assist you.",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 3.7884375000000006,
+        "endTime": 7.2815625,
+        "text": "Hello, I'd like to order flowers and I think you have what I'm looking for.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 7.7709375000000005,
+        "endTime": 10.6396875,
+        "text": "I'd be happy to take care of your order, may have your name please.",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 11.129062500000003,
+        "endTime": 12.006562500000001,
+        "text": "Randall Thomas.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 12.563437500000003,
+        "endTime": 14.976562500000004,
+        "text": "Randall Thomas, can you spell that for me?",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 15.5503125,
+        "endTime": 16.0396875,
+        "text": "Randall,",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 16.478437500000002,
+        "endTime": 17.4234375,
+        "text": "R-A-N-D-A-L-L,",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 19.5496875,
+        "endTime": 20.0559375,
+        "text": "Thomas.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 20.6128125,
+        "endTime": 22.0134375,
+        "text": "Thank",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 22.7896875,
+        "endTime": 27.2109375,
+        "text": "you for that information Randall. May have your home or office number area code first.",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 34.3659375,
+        "endTime": 40.727812500000006,
+        "text": "That's 409-866-5088. Do you have a fax number or email address?",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 41.2003125,
+        "endTime": 42.533437500000005,
+        "text": "My email is",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 43.0903125,
+        "endTime": 44.0353125,
+        "text": "RandallThomasatgmail.com",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 46.93781250000001,
+        "endTime": 51.730312500000004,
+        "text": "RandallThomasatgmail.com May have your shipping address?",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 51.98343750000001,
+        "endTime": 52.94531250000001,
+        "text": "6800,",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 54.362812500000004,
+        "endTime": 55.27406250000001,
+        "text": "Batters Avenue,",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 56.10093750000001,
+        "endTime": 57.26531250000001,
+        "text": "Fulmont,",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 58.159687500000004,
+        "endTime": 58.902187500000004,
+        "text": "Texas, lift code 7706",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 61.58531250000001,
+        "endTime": 61.60218750000001,
+        "text": "Gladys",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 61.60218750000001,
+        "endTime": 66.4790625,
+        "text": "Avenue Beaumont, Texas ZIP Code 77706.",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 66.8840625,
+        "endTime": 70.56281249999999,
+        "text": "Thank you for the information. What products were you interested in purchasing?",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 71.2040625,
+        "endTime": 72.9928125,
+        "text": "Red roses, probably a dozen.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 74.0221875,
+        "endTime": 76.6715625,
+        "text": "One dozen of red roses, do you want long stems?",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 76.7221875,
+        "endTime": 77.2115625,
+        "text": "Sure.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 77.7178125,
+        "endTime": 81.1265625,
+        "text": "Alright, Randall, let me process your order. One moment please.",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 82.5440625,
+        "endTime": 82.8309375,
+        "text": "Okay.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 85.1428125,
+        "endTime": 93.8840625,
+        "text": "Randomly you're ordering one dozen long-stent red roses. The total amount of your order is $40 and it will be shipped to your address within 24 hours.",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 94.3228125,
+        "endTime": 95.7403125,
+        "text": "I was thinking of delivering my roses",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 96.0946875,
+        "endTime": 96.5165625,
+        "text": "again.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 96.9384375,
+        "endTime": 98.2884375,
+        "text": "Within 24 hours.",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 98.8453125,
+        "endTime": 99.5371875,
+        "text": "Okay, no problem.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 100.2290625,
+        "endTime": 101.9165625,
+        "text": "Is there anything else I can help you with?",
+        "speaker": "Speaker 1",
+        "channel": 0
+    },
+    {
+        "startTime": 102.5071875,
+        "endTime": 103.8234375,
+        "text": "That's all for now, thanks.",
+        "speaker": "Speaker 0",
+        "channel": 0
+    },
+    {
+        "startTime": 104.3803125,
+        "endTime": 107.8565625,
+        "text": "No problem, Rana. Thank you for calling Martha's Floor. Have a nice day.",
+        "speaker": "Speaker 1",
+        "channel": 0
+    }
+]

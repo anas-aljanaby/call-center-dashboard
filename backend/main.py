@@ -67,24 +67,19 @@ async def transcribe_audio(file: UploadFile):
             'file_transcription': {
                 'language_id': 'en',
                 'mode': 'advanced',
+            },
+            "speaker_diarization": {
+                "mode": "speakers",
+                "num_speakers" : 2,
             }
         }
-
         job_id = vai.transcribe(file=temp_file_path, config=config)
         result = vai.poll_until_complete(job_id)
 
         os.unlink(temp_file_path)
 
         if result.get('success'):
-            transcription_data = result['data']['result']['transcription']['channels']['0']
-            return {
-                "success": True,
-                "data": {
-                    "full_text": transcription_data['transcript'],
-                    "timestamps": transcription_data['timestamps'],
-                    "job_id": job_id
-                }
-            }
+            return result['data']['result']['transcription']['segments']
         else:
             raise HTTPException(
                 status_code=500,

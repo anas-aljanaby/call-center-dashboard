@@ -1,6 +1,7 @@
-
 export default function Home() {
   return (
-    <div>Home page</div>
+    <div className="min-h-screen bg-white">
+      Home page
+    </div>
   );
 }
