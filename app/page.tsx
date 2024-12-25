@@ -1,6 +1,7 @@
 import React from 'react';
 import ConversationTimeline from './components/ConversationTimeline';
 import CallDetails from './components/CallDetails';
+import ConversationSegments from './components/ConversationSegments';
 
 const dummySegments = [
   {
@@ -252,7 +253,7 @@ export default function Home() {
       <div className="flex">
         <CallDetails />
         <div className="w-1/2">
-          {/* Right half reserved for future component */}
+            <ConversationSegments segments={dummySegments} />
         </div>
       </div>
     </div>
