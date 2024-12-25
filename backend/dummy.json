@@ -11,7 +11,8 @@
         "endTime": 7.2815625,
         "text": "Hello, I'd like to order flowers and I think you have what I'm looking for.",
         "speaker": "Speaker 0",
-        "channel": 0
+        "channel": 0,
+        "label": "customer objection"
     },
     {
         "startTime": 7.7709375000000005,
