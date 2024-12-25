@@ -155,7 +155,6 @@ async def get_transcription_status(job_id: str):
             detail=f"Error fetching job status: {str(e)}"
         )
 
-# Add these new models at the top of the file
 class LabelDefinition(BaseModel):
     name: str
     description: str
@@ -177,71 +176,59 @@ async def label_segments(request: LabelingRequest):
     # Initialize OpenAI
     client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-    # Prepare the conversation context for the LLM
+    # Prepare the label descriptions once
     label_descriptions = "\n".join([
         f"- {label.name}: {label.description}"
         for label in request.possible_labels
     ])
 
-    # Prepare the conversation text
-    conversation = "\n".join([
-        f"[{segment.speaker}]: {segment.text}"
-        for segment in request.segments
-    ])
-
-    # Create the prompt for the LLM
-    prompt = f"""
-You are an AI assistant tasked with labeling segments of a customer service conversation.
+    # Process each segment individually
+    for i, segment in enumerate(request.segments):
+        # Create the prompt for the individual segment
+        prompt = f"""
+You are an AI assistant tasked with labeling a segment of a customer service conversation.
 The possible labels and their descriptions are:
 
 {label_descriptions}
 
-Here's the conversation:
+Here's the segment:
+[{segment.speaker}]: {segment.text}
 
-{conversation}
-
-For each segment, determine if it should have any of the defined labels. If a segment doesn't match any label criteria, leave it unlabeled.
-Provide the response as a JSON array where each element contains the segment index and the assigned label (or null if no label applies).
-Only respond with the JSON array, no additional text.
+Determine if this segment should have any of the defined labels. If the segment doesn't match any label criteria, respond with null.
+Be very conservative in your labeling. Don't assign any label unless it's very clear that this segment matches the label criteria.
+Provide the response as a single JSON object with format: {{"label": "label_name"}} or {{"label": null}}
+Only respond with the JSON object, no additional text.
 """
-    try:
-        # Call OpenAI API
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a conversation analysis assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            max_tokens=1000
-        )
+        try:
+            # Call OpenAI API for each segment
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": "You are a conversation analysis assistant."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=100
+            )
 
-        # Clean up the response
-        labels = response.choices[0].message.content
-        labels = labels.strip('`').replace('```json\n', '').replace('\n```', '').replace("json", "")
-        print(labels)
-        label_data = json.loads(labels)
+            # Clean up the response
+            label_json = response.choices[0].message.content
+            label_json = label_json.strip('`').replace('```json\n', '').replace('\n```', '').replace("json", "")
+            label_data = json.loads(label_json)
+            
+            # Update the segment's label
+            request.segments[i].label = label_data["label"]
 
-        # Update the segments with their labels
-        for label_item in label_data:
-            segment_index = label_item["segment_index"]
-            if segment_index < len(request.segments):
-                request.segments[segment_index].label = label_item["label"]
+        except json.JSONDecodeError as e:
+            print(f"Error parsing OpenAI response for segment {i}: {str(e)}")
+            request.segments[i].label = None
+        except Exception as e:
+            print(f"Error processing segment {i}: {str(e)}")
+            request.segments[i].label = None
 
-        return {
-            "segments": [segment.dict() for segment in request.segments]
-        }
-
-    except json.JSONDecodeError as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error parsing OpenAI response: {str(e)}"
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error labeling segments: {str(e)}"
-        )
+    return {
+        "segments": [segment.dict() for segment in request.segments]
+    }
 
 if __name__ == "__main__":
     import uvicorn

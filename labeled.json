@@ -1,0 +1,428 @@
+{
+    "segments": [
+        {
+            "startTime": 1.9828125,
+            "endTime": 7.2309375,
+            "text": "انا اصعبك معك انجي من جريده الاندلس للبيوت تاكس بتاكس بقى اقدر اساعدك ازاي",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "greeting"
+        },
+        {
+            "startTime": 8.631562500000001,
+            "endTime": 13.5421875,
+            "text": "انا عايز حضرتك تساعديني بس في مبلغ اتحصل مني غلط وكنت عايز ارجعه يعني",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "problem_statement"
+        },
+        {
+            "startTime": 15.347812500000003,
+            "endTime": 18.9928125,
+            "text": "طيب ماشي ان شاء الله هقدر اساعدك بس ممكن تملينا الرقم الموجود على الاصاله بتاع حضرتك",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "information_gathering"
+        },
+        {
+            "startTime": 20.6296875,
+            "endTime": 22.4521875,
+            "text": "الواحد اربعه تلاته اتنين اربعه",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 23.8696875,
+            "endTime": 26.8903125,
+            "text": "طب ممكن تقول لي اشتريت امتى ومنين",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "information_gathering"
+        },
+        {
+            "startTime": 29.0671875,
+            "endTime": 31.3284375,
+            "text": "انا اشتريت يوم 218",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "problem_statement"
+        },
+        {
+            "startTime": 32.3409375,
+            "endTime": 34.1296875,
+            "text": "والانوان بمياه",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 32.5434375,
+            "endTime": 32.7796875,
+            "text": "ممكن",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 34.500937500000006,
+            "endTime": 35.85093750000001,
+            "text": "شرع ناسع",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 37.150312500000005,
+            "endTime": 38.4665625,
+            "text": "تحدي لي المكان بس",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "problem_statement"
+        },
+        {
+            "startTime": 40.0359375,
+            "endTime": 41.588437500000005,
+            "text": "المياه شرع المخشر ناسع",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 42.516562500000006,
+            "endTime": 42.92156250000001,
+            "text": "تمام",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 43.4278125,
+            "endTime": 45.604687500000004,
+            "text": "طب بعد اذن حضرتك ممكن تقول لي ايه من حضرتك",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "information_gathering"
+        },
+        {
+            "startTime": 46.3809375,
+            "endTime": 46.4821875,
+            "text": "التفصيل",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 47.78156250000001,
+            "endTime": 53.097187500000004,
+            "text": "انا دلوقتي اتحصل مني فلوس يعني مرتين في طلعة واحدة غلط. يعني الفلوس اتاخدت منه مرتين غلط.",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "problem_statement"
+        },
+        {
+            "startTime": 54.21093750000001,
+            "endTime": 54.63281250000001,
+            "text": "بعتذر",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 55.4259375,
+            "endTime": 58.51406250000001,
+            "text": "لحضرتك كويس بس ممكن تسجلي مع المد اكتر",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 60.42093750000001,
+            "endTime": 63.610312500000006,
+            "text": "آآ كنت اشتريت آآ من عندكم فلوس يا امي ازاي?",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "problem_statement"
+        },
+        {
+            "startTime": 63.947812500000005,
+            "endTime": 65.0446875,
+            "text": "واحد وعشرين بوستة.",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 65.7028125,
+            "endTime": 69.6684375,
+            "text": "واتاخد مني بتاعة اللزج ان هي يعني اتاخد مني حقي التاسع مرتين.",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "problem_statement"
+        },
+        {
+            "startTime": 70.5796875,
+            "endTime": 72.3009375,
+            "text": "انا كنت عايز ارجع الفلوس اللي له يعني.",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "problem_statement"
+        },
+        {
+            "startTime": 73.7015625,
+            "endTime": 76.6546875,
+            "text": "طيب نتظر معايا لحظات بعد اذنك هتسجل لحظات",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "information_gathering"
+        },
+        {
+            "startTime": 77.7009375,
+            "endTime": 79.4053125,
+            "text": "تمام. اخبار حضرتك.",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "greeting"
+        },
+        {
+            "startTime": 83.2190625,
+            "endTime": 84.8390625,
+            "text": "معايا وتكلم مع المدير",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 85.8853125,
+            "endTime": 86.2396875,
+            "text": "خلاص بقى.",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 92.6521875,
+            "endTime": 97.1071875,
+            "text": "بعد ذلك عن زعيق لحضرتك يا فندن وكلمت لهم الى غير التفاصيل المشكله",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 97.7315625,
+            "endTime": 99.7903125,
+            "text": "ووقف انها رجع لحضرتك المبلغ",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 101.4609375,
+            "endTime": 105.0890625,
+            "text": "واسع يعني طب تمام بصراحه انا مستاه يعني من اللي حصل تمام",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "problem_statement"
+        },
+        {
+            "startTime": 105.8146875,
+            "endTime": 111.4003125,
+            "text": "بلغي تحياتي يعني لموديل وشكرو لي طب يعني انا يعني ممكن اخد الفلوس دي انت ان شاء الله",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 111.9740625,
+            "endTime": 114.84281250000001,
+            "text": "حاضرتك تقدر تستلمها خلال 48 ساعه",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "solution_proposal"
+        },
+        {
+            "startTime": 115.9903125,
+            "endTime": 117.4921875,
+            "text": "لالت من اربعين ساعات وصلنا يعني",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 117.9309375,
+            "endTime": 118.7915625,
+            "text": "باذن الله",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 119.5003125,
+            "endTime": 122.0484375,
+            "text": "انا مستقران لحضرتك انا الحلو حضرتك يعني بصراحه",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 119.6353125,
+            "endTime": 120.1753125,
+            "text": "ممكن",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 122.9765625,
+            "endTime": 125.3559375,
+            "text": "اما تبقى حضرتك عشان ابعتلي تاكيد",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 127.3978125,
+            "endTime": 130.68843750000002,
+            "text": "ان ال اتش ا او",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 131.43093750000003,
+            "endTime": 133.6246875,
+            "text": "500 ات الزميل دوت كوم",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 136.00406250000003,
+            "endTime": 139.2946875,
+            "text": "طيب بعد ترسال للحقرتك بوضح فيها اما بغلى يتحول",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 142.6021875,
+            "endTime": 146.4328125,
+            "text": "تمام تمام الرساله اه الرساله وصلت اهي تمام",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 142.8384375,
+            "endTime": 143.14218749999998,
+            "text": "تمام",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 147.63093750000002,
+            "endTime": 149.0653125,
+            "text": "طيب بقدر اساعدك في حاجه ثانيه",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "closing"
+        },
+        {
+            "startTime": 150.21281249999998,
+            "endTime": 152.3053125,
+            "text": "لا تمام ما سمحتش اجي اي حاجه ثانيه",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 153.43593750000002,
+            "endTime": 156.5071875,
+            "text": "طيب حضرتك تقدر تقيم الخدمه اللي احنا قدمناها اليوم",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "information_gathering"
+        },
+        {
+            "startTime": 158.14406250000002,
+            "endTime": 162.7678125,
+            "text": "تمام ما شفت اي مشكله احنا برضو راح اي مشكله شكرا لحضرتك انا مش فاكر جدا لحضرتك على المساعده",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 163.7971875,
+            "endTime": 167.0203125,
+            "text": "شكرا جدا لحضرتك. رح احول حضرتك تعال نتابع نتقفل معك.",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "closing"
+        },
+        {
+            "startTime": 167.6953125,
+            "endTime": 172.38656250000003,
+            "text": "واتمنى ان انا تكون متعجب حضرتك وترجعه لنا للاتجاه.",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 173.6353125,
+            "endTime": 174.4790625,
+            "text": "آآ",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 173.90531249999998,
+            "endTime": 174.88406250000003,
+            "text": "تمام تمام",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": null
+        },
+        {
+            "startTime": 175.72781250000003,
+            "endTime": 179.8284375,
+            "text": "وحابة اشكرك مرة تانية. واتمنى ان انت تنورنا في اي وقت.",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": "closing"
+        },
+        {
+            "startTime": 180.40218750000003,
+            "endTime": 181.31343750000002,
+            "text": "وانت حقيقي.",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        },
+        {
+            "startTime": 182.2921875,
+            "endTime": 185.2453125,
+            "text": "تمام انا مش فاكر جدا لحضرتك واتمنى لحضرتك التوفيق",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "closing"
+        },
+        {
+            "startTime": 185.56593750000002,
+            "endTime": 186.20718750000003,
+            "text": "مع السلامه",
+            "speaker": "Speaker 0",
+            "channel": 1,
+            "label": "closing"
+        },
+        {
+            "startTime": 185.9034375,
+            "endTime": 186.37593750000002,
+            "text": "شكرا.",
+            "speaker": "Speaker 0",
+            "channel": 0,
+            "label": null
+        }
+    ]
+}
