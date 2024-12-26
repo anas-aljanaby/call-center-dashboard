@@ -9,7 +9,6 @@ class TranscriptionModel:
         self.vai = ns.VoiceAI(api_key=self.api_key)
         
     def transcribe(self, file_content: bytes) -> Dict[str, Any]:
-        # Create temporary file to store uploaded audio
         with NamedTemporaryFile(delete=False, suffix='.mp3') as temp_file:
             temp_file.write(file_content)
             temp_file_path = temp_file.name
@@ -22,11 +21,9 @@ class TranscriptionModel:
                 }
             }
             
-            # Start transcription
             job_id = self.vai.transcribe(file=temp_file_path, config=config)
             result = self.vai.poll_until_complete(job_id)
             
-            # Extract relevant information
             if result.get('success'):
                 transcription_data = result['data']['result']['transcription']['channels']['0']
                 return {
@@ -37,5 +34,4 @@ class TranscriptionModel:
                 raise Exception("Transcription failed")
                 
         finally:
-            # Clean up temporary file
             os.unlink(temp_file_path) 

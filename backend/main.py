@@ -15,12 +15,10 @@ from pydantic import BaseModel
 from typing import List, Dict, Optional
 import openai
 
-# Load environment variables
 load_dotenv()
 
 app = FastAPI()
 
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -29,7 +27,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Neural Space API key
 NEURALSPACE_API_KEY = os.getenv('NEURALSPACE_API_KEY')
 if not NEURALSPACE_API_KEY:
     raise ValueError("NEURALSPACE_API_KEY environment variable is not set")
@@ -40,10 +37,8 @@ async def enhance_audio_file(input_path, output_path):
     """
     Enhance the audio quality of the input file
     """
-    # Load the audio file
     audio, sr = librosa.load(input_path, sr=None)
     
-    # Apply noise reduction
     noise_sample = audio[0:int(sr)]
     reduced_noise = nr.reduce_noise(
         y=audio,
@@ -52,13 +47,8 @@ async def enhance_audio_file(input_path, output_path):
         n_std_thresh_stationary=1.5
     )
     
-    # Enhance speech frequencies
     speech_enhanced = librosa.effects.preemphasis(reduced_noise, coef=0.97)
-    
-    # Normalize audio
     speech_enhanced = librosa.util.normalize(speech_enhanced)
-    
-    # Save the enhanced audio
     sf.write(output_path, speech_enhanced, sr)
 
 @app.post("/api/transcribe-dummy")
@@ -66,7 +56,6 @@ async def transcribe_audio_dummy(file: UploadFile):
     """
     Dummy endpoint that returns mock transcription data from dummy.json for testing
     """
-    # Get the directory containing the current script
     current_dir = os.path.dirname(os.path.abspath(__file__))
     dummy_file_path = os.path.join(current_dir, "dummy.json")
 
@@ -90,18 +79,14 @@ async def transcribe_audio(file: UploadFile):
         )
 
     try:
-        # Create temporary files for original and enhanced audio
         with NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file, \
              NamedTemporaryFile(delete=False, suffix='.wav') as enhanced_file:
             
-            # Save original upload to temp file
             content = await file.read()
             temp_file.write(content)
             
-            # Enhance the audio
             await enhance_audio_file(temp_file.name, enhanced_file.name)
 
-            # Use the enhanced audio file for transcription
             config = {
                 'file_transcription': {
                     'language_id': 'ar-sa',
@@ -110,12 +95,12 @@ async def transcribe_audio(file: UploadFile):
                 "speaker_diarization": {
                     "mode": "speakers",
                     "num_speakers" : 2,
-                }
+                },
+                "sentiment_detect": True
             }
             job_id = vai.transcribe(file=enhanced_file.name, config=config)
             result = vai.poll_until_complete(job_id)
 
-            # Clean up temporary files
             os.unlink(temp_file.name)
             os.unlink(enhanced_file.name)
 
@@ -128,7 +113,6 @@ async def transcribe_audio(file: UploadFile):
                 )
 
     except Exception as e:
-        # Clean up temporary files in case of error
         for path in [temp_file.name, enhanced_file.name]:
             if 'temp_file' in locals():
                 try:
@@ -173,18 +157,14 @@ class LabelingRequest(BaseModel):
 
 @app.post("/api/label-segments")
 async def label_segments(request: LabelingRequest):
-    # Initialize OpenAI
     client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
-    # Prepare the label descriptions once
     label_descriptions = "\n".join([
         f"- {label.name}: {label.description}"
         for label in request.possible_labels
     ])
 
-    # Process each segment individually
     for i, segment in enumerate(request.segments):
-        # Create the prompt for the individual segment
         prompt = f"""
 You are an AI assistant tasked with labeling a segment of a customer service conversation.
 The possible labels and their descriptions are:
@@ -200,7 +180,6 @@ Provide the response as a single JSON object with format: {{"label": "label_name
 Only respond with the JSON object, no additional text.
 """
         try:
-            # Call OpenAI API for each segment
             response = client.chat.completions.create(
                 model="gpt-4o",
                 messages=[
@@ -211,12 +190,10 @@ Only respond with the JSON object, no additional text.
                 max_tokens=100
             )
 
-            # Clean up the response
             label_json = response.choices[0].message.content
             label_json = label_json.strip('`').replace('```json\n', '').replace('\n```', '').replace("json", "")
             label_data = json.loads(label_json)
             
-            # Update the segment's label
             request.segments[i].label = label_data["label"]
 
         except json.JSONDecodeError as e:
