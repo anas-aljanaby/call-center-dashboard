@@ -207,6 +207,145 @@ Only respond with the JSON object, no additional text.
         "segments": [segment.dict() for segment in request.segments]
     }
 
+class TranscriptSegment(BaseModel):
+    startTime: float
+    endTime: float
+    text: str
+    speaker: Optional[str] = None
+    channel: Optional[int] = None
+    checklist_item: Optional[str] = None
+
+class ChecklistRequest(BaseModel):
+    segments: List[TranscriptSegment]
+    checklist: List[str]
+
+@app.post("/api/analyze-checklist")
+async def analyze_checklist(request: ChecklistRequest):
+    client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    
+    # Prepare the segments text with numbers
+    numbered_segments = "\n".join([
+        f"{i+1}. {segment.text}"
+        for i, segment in enumerate(request.segments)
+    ])
+    
+    # Prepare the checklist items
+    checklist_items = "\n".join([
+        f"- {item}" for item in request.checklist
+    ])
+    
+    prompt = f"""
+    Given these conversation segments:
+    {numbered_segments}
+    
+    And this checklist:
+    {checklist_items}
+    
+    For each segment number, determine if it fulfills any of the checklist items.
+    Only match segments that clearly fulfill the checklist item.
+    Respond in JSON format like this:
+    {{
+        "matches": [
+            {{"segment": 1, "checklist_item": "Greet Customer"}},
+            {{"segment": 3, "checklist_item": "Gather Relevant Information"}}
+        ]
+    }}
+    Only include segments that match a checklist item.
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a conversation analysis assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=500
+        )
+        
+        # Parse the response
+        result = json.loads(response.choices[0].message.content)
+        
+        # Update the original segments with checklist items
+        segment_matches = {match["segment"]: match["checklist_item"] 
+                         for match in result["matches"]}
+        
+        for i, segment in enumerate(request.segments):
+            if i + 1 in segment_matches:
+                segment.checklist_item = segment_matches[i + 1]
+        
+        return {"segments": [segment.dict() for segment in request.segments]}
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error analyzing segments: {str(e)}"
+        )
+
+class ConversationSegment(BaseModel):
+    startTime: float
+    endTime: float
+    text: str
+    speaker: str
+    channel: int
+    checklist_item: Optional[str] = None
+
+class ConversationRequest(BaseModel):
+    segments: List[ConversationSegment]
+
+@app.post("/api/analyze-events")
+async def analyze_events(request: ConversationRequest):
+    client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    
+    # Prepare the conversation flow
+    conversation = "\n".join([
+        f"[{segment.speaker}]: {segment.text}"
+        for segment in request.segments
+    ])
+    
+    prompt = """
+    Analyze this customer service conversation and identify key events that occurred.
+    Focus on important actions, requests, or decisions made during the conversation.
+    
+    For each event:
+    1. Clearly indicate who took the action (Agent or Customer)
+    2. Describe the specific event or action
+    3. Include any relevant details or outcomes
+    
+    Format your response as a JSON array of events like this:
+    {
+        "events": [
+            "Customer explained they were charged incorrectly and requested a refund",
+            "Agent verified the transaction details in the system",
+            "Agent approved a refund of 50 AED"
+        ]
+    }
+    
+    Conversation:
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a conversation analysis assistant specialized in Arabic customer service interactions."},
+                {"role": "user", "content": prompt + conversation}
+            ],
+            temperature=0.3,
+            max_tokens=500
+        )
+        
+        # Parse the response
+        result = json.loads(response.choices[0].message.content)
+        return result
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error analyzing conversation events: {str(e)}"
+        )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
