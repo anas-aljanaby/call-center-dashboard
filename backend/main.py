@@ -346,6 +346,54 @@ async def analyze_events(request: ConversationRequest):
             detail=f"Error analyzing conversation events: {str(e)}"
         )
 
+class TranscriptionSegment(BaseModel):
+    startTime: float
+    endTime: float
+    text: str
+    speaker: str
+
+class SummaryRequest(BaseModel):
+    segments: List[TranscriptionSegment]
+
+@app.post("/api/summarize-conversation")
+async def summarize_conversation(request: SummaryRequest):
+    client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    
+    # Prepare the conversation flow
+    conversation = "\n".join([
+        f"[{segment.speaker}]: {segment.text}"
+        for segment in request.segments
+    ])
+    
+    prompt = """
+    Please provide a concise, single-paragraph summary of this customer service conversation in Arabic.
+    Include the main purpose of the call, key points discussed, and any resolutions reached.
+    Respond with a JSON object containing only a "summary" field with the paragraph.
+
+    Conversation:
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a conversation analysis assistant specialized in Arabic customer service interactions."},
+                {"role": "user", "content": prompt + conversation}
+            ],
+            temperature=0.3,
+            max_tokens=500
+        )
+        
+        # Parse the response
+        result = json.loads(response.choices[0].message.content)
+        return {"summary": result["summary"]}
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error summarizing conversation: {str(e)}"
+        )
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
