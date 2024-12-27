@@ -27,6 +27,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+MODEL = "gpt-3.5-turbo"
+
 NEURALSPACE_API_KEY = os.getenv('NEURALSPACE_API_KEY')
 if not NEURALSPACE_API_KEY:
     raise ValueError("NEURALSPACE_API_KEY environment variable is not set")
@@ -105,7 +107,9 @@ async def transcribe_audio(file: UploadFile):
             os.unlink(enhanced_file.name)
 
             if result.get('success'):
-                return result['data']['result']['transcription']['segments']
+                return {
+                    "segments": result['data']['result']['transcription']['segments']
+                }
             else:
                 raise HTTPException(
                     status_code=500,
@@ -164,7 +168,8 @@ async def label_segments(request: LabelingRequest):
         for label in request.possible_labels
     ])
 
-    for i, segment in enumerate(request.segments):
+    segments = request.segments
+    for i, segment in enumerate(segments):
         prompt = f"""
 You are an AI assistant tasked with labeling a segment of a customer service conversation.
 The possible labels and their descriptions are:
@@ -181,7 +186,7 @@ Only respond with the JSON object, no additional text.
 """
         try:
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model=MODEL,
                 messages=[
                     {"role": "system", "content": "You are a conversation analysis assistant."},
                     {"role": "user", "content": prompt}
@@ -194,17 +199,17 @@ Only respond with the JSON object, no additional text.
             label_json = label_json.strip('`').replace('```json\n', '').replace('\n```', '').replace("json", "")
             label_data = json.loads(label_json)
             
-            request.segments[i].label = label_data["label"]
+            segments[i].label = label_data["label"]
 
         except json.JSONDecodeError as e:
             print(f"Error parsing OpenAI response for segment {i}: {str(e)}")
-            request.segments[i].label = None
+            segments[i].label = None
         except Exception as e:
             print(f"Error processing segment {i}: {str(e)}")
-            request.segments[i].label = None
+            segments[i].label = None
 
     return {
-        "segments": [segment.dict() for segment in request.segments]
+        "segments": [segment.dict() for segment in segments]
     }
 
 class TranscriptSegment(BaseModel):
@@ -251,11 +256,12 @@ async def analyze_checklist(request: ChecklistRequest):
         ]
     }}
     Only include segments that match a checklist item.
+    Respond with only the JSON object, no additional text or formatting.
     """
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model=MODEL,
             messages=[
                 {"role": "system", "content": "You are a conversation analysis assistant."},
                 {"role": "user", "content": prompt}
@@ -264,20 +270,34 @@ async def analyze_checklist(request: ChecklistRequest):
             max_tokens=500
         )
         
-        # Parse the response
-        result = json.loads(response.choices[0].message.content)
+        # Clean and parse the response
+        response_text = response.choices[0].message.content.strip()
+        # Remove any potential markdown formatting
+        response_text = response_text.replace('```json', '').replace('```', '').strip()
+        
+        try:
+            result = json.loads(response_text)
+        except json.JSONDecodeError:
+            print(f"Failed to parse response: {response_text}")
+            result = {"matches": []}
         
         # Update the original segments with checklist items
+        segments = request.segments
         segment_matches = {match["segment"]: match["checklist_item"] 
-                         for match in result["matches"]}
+                         for match in result.get("matches", [])}
         
-        for i, segment in enumerate(request.segments):
+        for i, segment in enumerate(segments):
             if i + 1 in segment_matches:
                 segment.checklist_item = segment_matches[i + 1]
+            else:
+                segment.checklist_item = None  # Explicitly set None for unmatched segments
         
-        return {"segments": [segment.dict() for segment in request.segments]}
+        return {
+            "segments": [segment.dict() for segment in segments]
+        }
         
     except Exception as e:
+        print(f"Error in analyze_checklist: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Error analyzing segments: {str(e)}"
@@ -327,7 +347,7 @@ async def analyze_events(request: ConversationRequest):
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model=MODEL,
             messages=[
                 {"role": "system", "content": "You are a conversation analysis assistant specialized in Arabic customer service interactions."},
                 {"role": "user", "content": prompt + conversation}
@@ -375,7 +395,7 @@ async def summarize_conversation(request: SummaryRequest):
     
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model=MODEL,
             messages=[
                 {"role": "system", "content": "You are a conversation analysis assistant specialized in Arabic customer service interactions."},
                 {"role": "user", "content": prompt + conversation}
