@@ -1,7 +1,10 @@
-import React from 'react';
+"use client";
+import React, { useState, useRef, useEffect } from 'react';
 import ConversationTimeline from './components/ConversationTimeline';
 import CallDetails from './components/CallDetails';
 import ConversationSegments from './components/ConversationSegments';
+import AudioPlayer from './components/AudioPlayer';
+import Sidebar from './components/Sidebar';
 
 const dummySegments = [
   {
@@ -244,18 +247,90 @@ const dummySegments = [
   }
 ];
 
-const duration = 180; // Total duration in seconds
-
 export default function Home() {
+  const [currentTime, setCurrentTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (audioUrl) {
+      audioRef.current = new Audio(audioUrl);
+      
+      audioRef.current.addEventListener('loadedmetadata', () => {
+        if (audioRef.current) {
+          setDuration(audioRef.current.duration);
+        }
+      });
+
+      audioRef.current.addEventListener('timeupdate', () => {
+        if (audioRef.current) {
+          setCurrentTime(audioRef.current.currentTime);
+        }
+      });
+
+      audioRef.current.addEventListener('ended', () => {
+        setIsPlaying(false);
+      });
+
+      // Cleanup
+      return () => {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          URL.revokeObjectURL(audioUrl);
+        }
+      };
+    }
+  }, [audioUrl]);
+
+  const handlePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleSeek = (time: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  const handleFileSelect = (url: string) => {
+    setAudioUrl(url);
+    setCurrentTime(0);
+    setIsPlaying(false);
+  };
+
   return (
-    <div className="min-h-screen bg-white">
-      <ConversationTimeline segments={dummySegments} duration={duration} />
-      <div className="flex h-[calc(100vh-160px)] mt-4 border-t border-gray-200">
-        <CallDetails />
-        <div className="flex-1 pl-3 border-l border-gray-200 ml-2">
-          <ConversationSegments segments={dummySegments} />
+    <main className="flex min-h-screen">
+      <Sidebar onFileSelect={handleFileSelect} />
+      <div className="flex-1">
+        <div className="min-h-screen bg-white">
+          <ConversationTimeline segments={dummySegments} duration={duration} />
+          <div className="max-w-3xl mx-auto">
+            <AudioPlayer
+              duration={duration}
+              currentTime={currentTime}
+              isPlaying={isPlaying}
+              onPlayPause={handlePlayPause}
+              onSeek={handleSeek}
+            />
+          </div>
+          <div className="flex h-[calc(100vh-160px)] mt-4 border-t border-gray-200">
+            <CallDetails />
+            <div className="flex-1 pl-3 border-l border-gray-200 ml-2">
+              <ConversationSegments segments={dummySegments} />
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
