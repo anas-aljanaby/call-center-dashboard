@@ -250,10 +250,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       <ConversationTimeline segments={dummySegments} duration={duration} />
-      <div className="flex">
+      <div className="flex h-[calc(100vh-160px)] mt-4 border-t border-gray-200">
         <CallDetails />
-        <div className="w-1/2">
-            <ConversationSegments segments={dummySegments} />
+        <div className="flex-1 pl-3 border-l border-gray-200 ml-2">
+          <ConversationSegments segments={dummySegments} />
         </div>
       </div>
     </div>
