@@ -6,7 +6,8 @@ from pathlib import Path
 def test_transcribe_endpoint():
     # Setup paths
     current_dir = Path(__file__).parent
-    input_file = current_dir / "inputs" / "sample_audio.wav"
+    input_file = current_dir / "inputs" / "12.wav"
+    # input_file = "/Users/anes/Downloads/12.wav"
     output_dir = current_dir / "outputs"
     output_file = output_dir / "transcription_result.json"
 

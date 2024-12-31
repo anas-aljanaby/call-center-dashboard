@@ -5,7 +5,7 @@ from pathlib import Path
 def test_analyze_checklist():
     # Setup paths
     current_dir = Path(__file__).parent
-    input_file = current_dir / "inputs" / "transcription.json"
+    input_file = current_dir / "outputs" / "labeled_segments.json"
     output_dir = current_dir / "outputs"
     output_file = output_dir / "checklist_analysis.json"
 

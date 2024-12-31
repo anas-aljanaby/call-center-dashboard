@@ -22,7 +22,7 @@
       "text": "طيب ماشي ان شاء الله اقدر اساعدك بس ممكن تمليين الرقم الموجود على الاصاله بتاع حضرتك",
       "speaker": "Speaker 1",
       "channel": 0,
-      "checklist_item": "Verify customer identity"
+      "checklist_item": "Ask clarifying questions"
     },
     {
       "startTime": 20.6296875,
@@ -38,7 +38,7 @@
       "text": "طب ممكن تقولي اشتريت امتى ومنين",
       "speaker": "Speaker 1",
       "channel": 0,
-      "checklist_item": null
+      "checklist_item": "Ask clarifying questions"
     },
     {
       "startTime": 29.0671875,
@@ -94,7 +94,7 @@
       "text": "انا دلوقتي اتحصل مني فلوس يعني مرتين في طلعة واحدة غلط. يعني الفلوس اتخدت منه مرتين غلط.",
       "speaker": "Speaker 0",
       "channel": 0,
-      "checklist_item": "Listen to and understand customer's issue"
+      "checklist_item": null
     },
     {
       "startTime": 54.19406250000001,
@@ -142,7 +142,7 @@
       "text": "انا كنت عايز ارجع الفلوس اللي ليه يعني",
       "speaker": "Speaker 0",
       "channel": 0,
-      "checklist_item": "Ask clarifying questions"
+      "checklist_item": null
     },
     {
       "startTime": 73.7015625,
@@ -150,7 +150,7 @@
       "text": "طيب انتظر معايا لحظات بعد اذنك هتسلم المدير",
       "speaker": "Speaker 1",
       "channel": 0,
-      "checklist_item": null
+      "checklist_item": "Provide clear solution or next steps"
     },
     {
       "startTime": 77.7009375,
@@ -190,7 +190,7 @@
       "text": "بعد",
       "speaker": "Speaker 0",
       "channel": 0,
-      "checklist_item": "Provide clear solution or next steps"
+      "checklist_item": null
     },
     {
       "startTime": 92.6521875,
@@ -222,7 +222,7 @@
       "text": "تمام بلغي تحياتي يعني لموديل وشكره لي وطب انا يعني ممكن اخد الفلوس دي انت ان شاء الله.",
       "speaker": "Speaker 0",
       "channel": 0,
-      "checklist_item": "Confirm customer's understanding"
+      "checklist_item": null
     },
     {
       "startTime": 111.9234375,
@@ -230,7 +230,7 @@
       "text": "حاضر طب تقدر تتكلمها خلال تمانية واربعين ساعة.",
       "speaker": "Speaker 1",
       "channel": 0,
-      "checklist_item": null
+      "checklist_item": "Provide clear solution or next steps"
     },
     {
       "startTime": 115.9734375,
@@ -246,7 +246,7 @@
       "text": "بازن الله.",
       "speaker": "Speaker 1",
       "channel": 0,
-      "checklist_item": null
+      "checklist_item": "Confirm customer's understanding"
     },
     {
       "startTime": 119.5003125,
@@ -318,7 +318,7 @@
       "text": "طيب اقدر اساعدك في حاجة تانية?",
       "speaker": "Speaker 1",
       "channel": 0,
-      "checklist_item": null
+      "checklist_item": "Ask clarifying questions"
     },
     {
       "startTime": 150.21281249999998,
@@ -334,7 +334,7 @@
       "text": "طيب حضرتك تقدر تقيم الخدمة اللي احنا قدمناها اليوم?",
       "speaker": "Speaker 1",
       "channel": 0,
-      "checklist_item": null
+      "checklist_item": "Thank the customer"
     },
     {
       "startTime": 158.1271875,
@@ -350,7 +350,7 @@
       "text": "شكرا جدا لحضرتك. راح احول حضرتك حاليا بعد ما اتقفل معك.",
       "speaker": "Speaker 1",
       "channel": 0,
-      "checklist_item": null
+      "checklist_item": "Professional closing"
     },
     {
       "startTime": 167.6953125,
@@ -414,7 +414,7 @@
       "text": "على الفضل.",
       "speaker": "Speaker 0",
       "channel": 0,
-      "checklist_item": "Professional closing"
+      "checklist_item": null
     }
   ]
 }

@@ -27,7 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODEL = "gpt-3.5-turbo"
+MODEL = "gpt-4o"
 
 NEURALSPACE_API_KEY = os.getenv('NEURALSPACE_API_KEY')
 if not NEURALSPACE_API_KEY:
@@ -91,7 +91,7 @@ async def transcribe_audio(file: UploadFile):
 
             config = {
                 'file_transcription': {
-                    'language_id': 'ar-sa',
+                    'language_id': 'ar-ir',
                     'mode': 'advanced',
                 },
                 "speaker_diarization": {
@@ -199,7 +199,9 @@ Only respond with the JSON object, no additional text.
             label_json = label_json.strip('`').replace('```json\n', '').replace('\n```', '').replace("json", "")
             label_data = json.loads(label_json)
             
-            segments[i].label = label_data["label"]
+            segment_dict = segment.dict()
+            segment_dict["label"] = label_data["label"]
+            segments[i] = Segment(**segment_dict)
 
         except json.JSONDecodeError as e:
             print(f"Error parsing OpenAI response for segment {i}: {str(e)}")
@@ -272,7 +274,6 @@ async def analyze_checklist(request: ChecklistRequest):
         
         # Clean and parse the response
         response_text = response.choices[0].message.content.strip()
-        # Remove any potential markdown formatting
         response_text = response_text.replace('```json', '').replace('```', '').strip()
         
         try:
@@ -281,16 +282,15 @@ async def analyze_checklist(request: ChecklistRequest):
             print(f"Failed to parse response: {response_text}")
             result = {"matches": []}
         
-        # Update the original segments with checklist items
+        # Preserve existing segment data while adding checklist items
         segments = request.segments
         segment_matches = {match["segment"]: match["checklist_item"] 
                          for match in result.get("matches", [])}
         
         for i, segment in enumerate(segments):
-            if i + 1 in segment_matches:
-                segment.checklist_item = segment_matches[i + 1]
-            else:
-                segment.checklist_item = None  # Explicitly set None for unmatched segments
+            segment_dict = segment.dict()
+            segment_dict["checklist_item"] = segment_matches.get(i + 1)
+            segments[i] = TranscriptSegment(**segment_dict)
         
         return {
             "segments": [segment.dict() for segment in segments]
@@ -309,7 +309,6 @@ class ConversationSegment(BaseModel):
     text: str
     speaker: str
     channel: int
-    checklist_item: Optional[str] = None
 
 class ConversationRequest(BaseModel):
     segments: List[ConversationSegment]
@@ -356,11 +355,24 @@ async def analyze_events(request: ConversationRequest):
             max_tokens=500
         )
         
-        # Parse the response
-        result = json.loads(response.choices[0].message.content)
-        return result
+        # Clean and parse the response
+        response_text = response.choices[0].message.content.strip()
+        response_text = response_text.replace('```json', '').replace('```', '').strip()
+        
+        try:
+            result = json.loads(response_text)
+            key_events = result.get("events", [])
+        except json.JSONDecodeError:
+            print(f"Failed to parse response: {response_text}")
+            key_events = []
+        
+        return {
+            "segments": [segment.dict() for segment in request.segments],
+            "key_events": key_events
+        }
         
     except Exception as e:
+        print(f"Error in analyze_events: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Error analyzing conversation events: {str(e)}"
@@ -404,11 +416,24 @@ async def summarize_conversation(request: SummaryRequest):
             max_tokens=500
         )
         
-        # Parse the response
-        result = json.loads(response.choices[0].message.content)
-        return {"summary": result["summary"]}
+        # Clean and parse the response
+        response_text = response.choices[0].message.content.strip()
+        response_text = response_text.replace('```json', '').replace('```', '').strip()
+        
+        try:
+            result = json.loads(response_text)
+            summary = result.get("summary", "")
+        except json.JSONDecodeError:
+            print(f"Failed to parse response: {response_text}")
+            summary = ""
+        
+        return {
+            "segments": [segment.dict() for segment in request.segments],
+            "summary": summary
+        }
         
     except Exception as e:
+        print(f"Error in summarize_conversation: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Error summarizing conversation: {str(e)}"

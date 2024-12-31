@@ -5,7 +5,7 @@ from pathlib import Path
 def test_label_segments():
     # Setup paths
     current_dir = Path(__file__).parent
-    input_file = current_dir / "inputs" / "transcription.json"
+    input_file = current_dir / "outputs" / "transcription_result.json"
     output_dir = current_dir / "outputs"
     output_file = output_dir / "labeled_segments.json"
 
@@ -23,28 +23,49 @@ def test_label_segments():
     # Prepare the request payload
     payload = {
         "segments": transcription_data["segments"],
-        "possible_labels": [
+        # "possible_labels": [
+        #     {
+        #         "name": "greeting",
+        #         "description": "Agent or customer greeting each other"
+        #     },
+        #     {
+        #         "name": "problem_statement",
+        #         "description": "Customer explaining their issue or reason for calling"
+        #     },
+        #     {
+        #         "name": "verification",
+        #         "description": "Agent verifying customer information or transaction details"
+        #     },
+        #     {
+        #         "name": "solution",
+        #         "description": "Agent providing a solution or taking action to resolve the issue"
+        #     },
+        #     {
+        #         "name": "farewell",
+        #         "description": "Agent or customer saying goodbye"
+        #     }
+         "possible_labels": [
             {
                 "name": "greeting",
                 "description": "Agent or customer greeting each other"
             },
             {
-                "name": "problem_statement",
-                "description": "Customer explaining their issue or reason for calling"
+                "name": "Info Request",
+                "description": "Customer asking for information or clarification"
             },
             {
-                "name": "verification",
+                "name": "Verification",
                 "description": "Agent verifying customer information or transaction details"
             },
             {
-                "name": "solution",
+                "name": "Solution",
                 "description": "Agent providing a solution or taking action to resolve the issue"
             },
             {
-                "name": "farewell",
+                "name": "Farewell",
                 "description": "Agent or customer saying goodbye"
             }
-        ]
+        ]       # ]
     }
 
     try:
