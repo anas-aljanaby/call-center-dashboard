@@ -105,6 +105,20 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
                     hover:file:bg-blue-100
                     transition-all duration-200"
                 />
+                {file && (
+                  <button
+                    onClick={handleTranscribe}
+                    disabled={isTranscribing}
+                    className={`mt-4 w-full py-2 px-4 rounded-lg text-sm font-semibold 
+                      ${isTranscribing 
+                        ? 'bg-gray-100 text-gray-500' 
+                        : 'bg-blue-600 text-white hover:bg-blue-700'} 
+                      transition-colors`}
+                  >
+                    {isTranscribing ? 'Transcribing...' : 'Transcribe Audio'}
+                  </button>
+                )}
+                {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
               </div>
 
               <div className="border-t border-gray-200 pt-6">

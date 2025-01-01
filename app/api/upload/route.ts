@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       filename: uniqueFilename,
       size: file.size,
       uploadDate: new Date().toISOString(),
-      status: 'ready',
+      status: 'ready' as const,
       path: `/uploads/${uniqueFilename}`
     };
 
