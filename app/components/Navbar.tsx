@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import { BiSpreadsheet, BiHeadphone, BiBarChartAlt2, BiData, BiCheckSquare, BiTrendingUp, BiSupport, BiPieChartAlt } from 'react-icons/bi';
 
+interface NavItemProps {
+  icon: React.ReactNode;
+  text: string;
+  isActive?: boolean;
+}
+
 const Navbar = () => {
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-2.5">
@@ -40,7 +46,7 @@ const Navbar = () => {
   );
 };
 
-const NavItem = ({ icon, text, isActive = false }) => {
+const NavItem = ({ icon, text, isActive = false }: NavItemProps) => {
   return (
     <Link 
       href="#"

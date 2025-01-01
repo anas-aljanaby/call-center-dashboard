@@ -6,8 +6,10 @@ import { BrainCircuit } from 'lucide-react';
 
 interface Segment {
   text: string;
-  start: number;
-  end: number;
+  startTime: number;
+  endTime: number;
+  speaker: string;
+  channel: number;
 }
 
 interface SidebarProps {
@@ -151,7 +153,7 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
             </div>
             
             <button
-              onClick={() => document.querySelector('input[type="file"]')?.click()}
+              onClick={() => (document.querySelector('input[type="file"]') as HTMLInputElement)?.click()}
               className="p-3 rounded-lg hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-900"
               title="Upload Audio"
             >
