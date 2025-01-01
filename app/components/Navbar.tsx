@@ -1,13 +1,18 @@
+"use client";
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { BiSpreadsheet, BiHeadphone, BiBarChartAlt2, BiData, BiCheckSquare, BiTrendingUp, BiSupport, BiPieChartAlt } from 'react-icons/bi';
 
 interface NavItemProps {
   icon: React.ReactNode;
   text: string;
+  href?: string;
   isActive?: boolean;
 }
 
 const Navbar = () => {
+  const pathname = usePathname();
+
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-2.5">
       <div className="flex items-center justify-between">
@@ -23,8 +28,18 @@ const Navbar = () => {
             <NavItem icon={<BiSpreadsheet />} text="Scorecard" />
             <NavItem icon={<BiHeadphone />} text="Interactions" />
             <NavItem icon={<BiBarChartAlt2 />} text="Leaderboard" />
-            <NavItem icon={<BiData />} text="Analyze" isActive />
-            <NavItem icon={<BiCheckSquare />} text="Data Enrichment" />
+            <NavItem 
+              icon={<BiData />} 
+              text="Analyze"  
+              href="/"
+              isActive={pathname === '/'} 
+            />
+            <NavItem 
+              icon={<BiCheckSquare />} 
+              text="Audio Library" 
+              href="/audio-library" 
+              isActive={pathname === '/audio-library'} 
+            />
             <NavItem icon={<BiTrendingUp />} text="Evaluations" />
             <NavItem icon={<BiSupport />} text="Coaching" />
             <NavItem icon={<BiPieChartAlt />} text="Reporting" />
@@ -46,10 +61,10 @@ const Navbar = () => {
   );
 };
 
-const NavItem = ({ icon, text, isActive = false }: NavItemProps) => {
+const NavItem = ({ icon, text, href = "#", isActive = false }: NavItemProps) => {
   return (
     <Link 
-      href="#"
+      href={href}
       className={`flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors ${
         isActive ? 'bg-gray-100 text-blue-600' : 'text-gray-600'
       }`}
