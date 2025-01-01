@@ -361,19 +361,22 @@ export default function Home() {
       />
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex flex-col bg-white">
-          <ConversationTimeline segments={segments} duration={duration} />
-          <div className="w-full px-4">
-            <AudioPlayer
-              duration={duration}
-              currentTime={currentTime}
-              isPlaying={isPlaying}
-              onPlayPause={handlePlayPause}
-              onSeek={handleSeek}
-            />
+          <div className="overflow-x-auto">
+            <div className="min-w-full">
+              <ConversationTimeline segments={segments} duration={duration} />
+              <div className="w-full px-4">
+                <AudioPlayer
+                  duration={duration}
+                  currentTime={currentTime}
+                  isPlaying={isPlaying}
+                  onPlayPause={handlePlayPause}
+                  onSeek={handleSeek}
+                />
+              </div>
+            </div>
           </div>
           <div className="flex flex-1 overflow-hidden mt-4 border-t border-gray-200">
             <CallDetails keyEvents={keyEvents} summary={summary} />
-            {/* flex-1 pl-3 border-l border-gray-200 ml-2 */}
             <div className="flex-1 pl-3 border-l border-gray-200 ml-2">
               <ConversationSegments segments={segments} />
             </div>

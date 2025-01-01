@@ -27,7 +27,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments, d
 
   return (
     <div className="w-full px-4">
-      <div className="relative h-40 overflow-x-auto">
+      <div className="relative h-40">
         <div className="flex flex-col justify-center items-start absolute left-0 top-0 bottom-0 z-10 bg-white px-4">
           <div className="h-1/2 flex items-center">
             <span className="text-sm font-medium" style={{ color: 'blue' }}>Speaker 1</span>
@@ -36,7 +36,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments, d
             <span className="text-sm font-medium" style={{ color: 'green' }}>Speaker 0</span>
           </div>
         </div>
-        <div className="relative h-full ml-24" style={{ width: `${totalWidth}px` }}>
+        <div className="relative h-full ml-24" style={{ width: `${Math.max(totalWidth, 800)}px` }}>
           <div className="absolute left-0 right-0 top-1/2 border-t border-gray-300"></div>
           <div className="absolute left-0 right-0 top-1/2 border-t border-gray-300" style={{ top: 'calc(50% + 10px)' }}></div>
           {segments.map((segment, index) => (
