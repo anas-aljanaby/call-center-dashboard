@@ -252,6 +252,9 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [segments, setSegments] = useState(dummySegments);
+  const [keyEvents, setKeyEvents] = useState<string[]>([]);
+  const [summary, setSummary] = useState<string>('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -308,13 +311,58 @@ export default function Home() {
     setIsPlaying(false);
   };
 
+  const handleTranscriptionComplete = async (transcriptionSegments: typeof dummySegments) => {
+    setSegments(transcriptionSegments);
+    
+    try {
+      // Fetch events analysis
+      const eventsResponse = await fetch('http://localhost:8000/api/analyze-events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ segments: transcriptionSegments }),
+      });
+
+      if (!eventsResponse.ok) {
+        throw new Error(`Error analyzing events: ${eventsResponse.statusText}`);
+      }
+
+      const eventsResult = await eventsResponse.json();
+      setKeyEvents(eventsResult.key_events || []);
+      console.log(eventsResult.key_events);
+
+      // Fetch summary
+      const summaryResponse = await fetch('http://localhost:8000/api/summarize-conversation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ segments: transcriptionSegments }),
+      });
+
+      if (!summaryResponse.ok) {
+        throw new Error(`Error getting summary: ${summaryResponse.statusText}`);
+      }
+
+      const summaryResult = await summaryResponse.json();
+      setSummary(summaryResult.summary || '');
+      console.log(summaryResult.summary);
+    } catch (error) {
+      console.error('Error analyzing conversation:', error);
+    }
+  };
+
   return (
-    <main className="flex min-h-screen">
-      <Sidebar onFileSelect={handleFileSelect} />
-      <div className="flex-1">
-        <div className="min-h-screen bg-white">
-          <ConversationTimeline segments={dummySegments} duration={duration} />
-          <div className="max-w-3xl mx-auto">
+    <main className="flex h-screen overflow-hidden">
+      <Sidebar 
+        onFileSelect={handleFileSelect} 
+        onTranscriptionComplete={handleTranscriptionComplete} 
+      />
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full flex flex-col bg-white">
+          <ConversationTimeline segments={segments} duration={duration} />
+          <div className="w-full px-4">
             <AudioPlayer
               duration={duration}
               currentTime={currentTime}
@@ -323,10 +371,11 @@ export default function Home() {
               onSeek={handleSeek}
             />
           </div>
-          <div className="flex h-[calc(100vh-160px)] mt-4 border-t border-gray-200">
-            <CallDetails />
+          <div className="flex flex-1 overflow-hidden mt-4 border-t border-gray-200">
+            <CallDetails keyEvents={keyEvents} summary={summary} />
+            {/* flex-1 pl-3 border-l border-gray-200 ml-2 */}
             <div className="flex-1 pl-3 border-l border-gray-200 ml-2">
-              <ConversationSegments segments={dummySegments} />
+              <ConversationSegments segments={segments} />
             </div>
           </div>
         </div>

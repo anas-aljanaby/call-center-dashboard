@@ -3,23 +3,22 @@
 import { useState } from 'react';
 
 interface TranscriptionResponse {
-  success: boolean;
-  data: {
-    full_text: string;
-    timestamps: Array<{
-      text: string;
-      start: number;
-      end: number;
-    }>;
-    job_id: string;
-  };
+  segments: Array<{
+    startTime: number;
+    endTime: number;
+    text: string;
+    speaker: string;
+    channel: number;
+    sentiment: string;
+  }>;
 }
 
 interface SidebarProps {
   onFileSelect: (audioUrl: string) => void;
+  onTranscriptionComplete: (segments: any[]) => void;
 }
 
-export default function Sidebar({ onFileSelect }: SidebarProps) {
+export default function Sidebar({ onFileSelect, onTranscriptionComplete }: SidebarProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +49,7 @@ export default function Sidebar({ onFileSelect }: SidebarProps) {
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:8000/api/transcribe-dummy', {
+      const response = await fetch('http://localhost:8000/api/transcribe', {
         method: 'POST',
         body: formData,
       });
@@ -61,6 +60,12 @@ export default function Sidebar({ onFileSelect }: SidebarProps) {
 
       const result: TranscriptionResponse = await response.json();
       console.log('Transcription result:', result);
+      
+      if (result.segments && result.segments.length > 0) {
+        onTranscriptionComplete(result.segments);
+      } else {
+        throw new Error('No transcription segments received');
+      }
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during transcription');

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { BiPlay, BiPause } from 'react-icons/bi';
 
 interface AudioPlayerProps {
@@ -25,13 +25,13 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 bg-white shadow-sm border border-gray-200 rounded-lg">
+    <div className="w-full max-w-full mx-auto px-4 py-2">
       <div className="flex items-center gap-4">
         <button
           onClick={onPlayPause}
-          className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
         >
-          {isPlaying ? <BiPause size={24} /> : <BiPlay size={24} />}
+          {isPlaying ? <BiPause size={20} /> : <BiPlay size={20} />}
         </button>
         
         <div className="flex-1">
@@ -41,11 +41,11 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
             max={duration}
             value={currentTime}
             onChange={(e) => onSeek(Number(e.target.value))}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
           />
         </div>
         
-        <div className="text-sm text-gray-600 min-w-[70px]">
+        <div className="text-xs text-gray-600 min-w-[60px]">
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
       </div>

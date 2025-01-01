@@ -56,18 +56,22 @@ async def enhance_audio_file(input_path, output_path):
 @app.post("/api/transcribe-dummy")
 async def transcribe_audio_dummy(file: UploadFile):
     """
-    Dummy endpoint that returns mock transcription data from dummy.json for testing
+    Dummy endpoint that returns mock transcription data from dummy.json for testing,
+    formatted to match the structure of the /api/transcribe endpoint
     """
     current_dir = os.path.dirname(os.path.abspath(__file__))
     dummy_file_path = os.path.join(current_dir, "dummy.json")
 
     with open(dummy_file_path, 'r') as f:
-        dummy_response = json.load(f)
+        dummy_data = json.load(f)
 
-    return dummy_response
+    # Wrap the dummy data in the same format as the transcribe endpoint
+    return {
+        "segments": dummy_data
+    }
 
 @app.post("/api/transcribe")
-async def transcribe_audio(file: UploadFile):
+async def transcribe_audio(file: UploadFile, enhance_audio: bool = False):
     """
     Endpoint to transcribe audio files and return both full transcription and word timestamps
     """
@@ -81,13 +85,16 @@ async def transcribe_audio(file: UploadFile):
         )
 
     try:
-        with NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file, \
-             NamedTemporaryFile(delete=False, suffix='.wav') as enhanced_file:
-            
+        with NamedTemporaryFile(delete=False, suffix=file_ext) as temp_file:
             content = await file.read()
             temp_file.write(content)
             
-            await enhance_audio_file(temp_file.name, enhanced_file.name)
+            input_file = temp_file.name
+            
+            if enhance_audio:
+                enhanced_file = NamedTemporaryFile(delete=False, suffix='.wav')
+                await enhance_audio_file(temp_file.name, enhanced_file.name)
+                input_file = enhanced_file.name
 
             config = {
                 'file_transcription': {
@@ -100,11 +107,12 @@ async def transcribe_audio(file: UploadFile):
                 },
                 "sentiment_detect": True
             }
-            job_id = vai.transcribe(file=enhanced_file.name, config=config)
+            job_id = vai.transcribe(file=input_file, config=config)
             result = vai.poll_until_complete(job_id)
 
             os.unlink(temp_file.name)
-            os.unlink(enhanced_file.name)
+            if enhance_audio:
+                os.unlink(enhanced_file.name)
 
             if result.get('success'):
                 return {
@@ -117,12 +125,16 @@ async def transcribe_audio(file: UploadFile):
                 )
 
     except Exception as e:
-        for path in [temp_file.name, enhanced_file.name]:
-            if 'temp_file' in locals():
-                try:
-                    os.unlink(path)
-                except:
-                    pass
+        if 'temp_file' in locals():
+            try:
+                os.unlink(temp_file.name)
+            except:
+                pass
+        if enhance_audio and 'enhanced_file' in locals():
+            try:
+                os.unlink(enhanced_file.name)
+            except:
+                pass
         
         raise HTTPException(
             status_code=500,
@@ -341,6 +353,8 @@ async def analyze_events(request: ConversationRequest):
         ]
     }
     
+    Do not include any other text or formatting in your response. Do not include the speaker name in the event description. 
+    Just provide the event description as in the example.
     Conversation:
     """
     
