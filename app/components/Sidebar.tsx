@@ -4,20 +4,15 @@ import { useState } from 'react';
 import { BiChevronLeft, BiChevronRight, BiUpload } from 'react-icons/bi';
 import { BrainCircuit } from 'lucide-react';
 
-interface TranscriptionResponse {
-  segments: Array<{
-    startTime: number;
-    endTime: number;
-    text: string;
-    speaker: string;
-    channel: number;
-    sentiment: string;
-  }>;
+interface Segment {
+  text: string;
+  start: number;
+  end: number;
 }
 
 interface SidebarProps {
   onFileSelect: (audioUrl: string) => void;
-  onTranscriptionComplete: (segments: any[]) => void;
+  onTranscriptionComplete: (segments: Segment[]) => void;
 }
 
 export default function Sidebar({ onFileSelect, onTranscriptionComplete }: SidebarProps) {
