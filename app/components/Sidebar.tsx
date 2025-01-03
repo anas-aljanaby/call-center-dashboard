@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BiChevronLeft, BiChevronRight, BiUpload } from 'react-icons/bi';
 import { BrainCircuit } from 'lucide-react';
 import AudioLibrary from './AudioLibrary';
+import UploadedAudioList from './UploadedAudioList';
 
 interface Segment {
   text: string;
@@ -83,7 +84,7 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
       <div className={`h-screen overflow-y-auto ${isCollapsed ? 'px-2 py-4' : 'p-6'}`}>
         {!isCollapsed ? (
           <div className={`transition-opacity duration-300 ${isCollapsed 
-          ? 'opacity-0 invisible w-0' : 'opacity-100 visible w-full delay-150'}`}>
+            ? 'opacity-0 invisible w-0' : 'opacity-100 visible w-full delay-150'}`}>
             <h2 className="text-2xl font-bold text-gray-800 mb-6 whitespace-nowrap">
               Audio Transcription
             </h2>
@@ -105,21 +106,33 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
                     hover:file:bg-blue-100
                     transition-all duration-200"
                 />
-                {file && (
+                {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+                
+                {file && !isTranscribing && (
                   <button
                     onClick={handleTranscribe}
-                    disabled={isTranscribing}
-                    className={`mt-4 w-full py-2 px-4 rounded-lg text-sm font-semibold 
-                      ${isTranscribing 
-                        ? 'bg-gray-100 text-gray-500' 
-                        : 'bg-blue-600 text-white hover:bg-blue-700'} 
-                      transition-colors`}
+                    className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-semibold 
+                             hover:bg-blue-700 transition-colors"
                   >
-                    {isTranscribing ? 'Transcribing...' : 'Transcribe Audio'}
+                    Transcribe Audio
                   </button>
                 )}
-                {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+                
+                {isTranscribing && (
+                  <div className="mt-4 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    <span className="ml-2 text-sm text-gray-600">Transcribing...</span>
+                  </div>
+                )}
               </div>
+
+              <UploadedAudioList 
+                onSelect={(audioUrl) => {
+                  setFile(null);
+                  onFileSelect(audioUrl);
+                }}
+                onTranscribe={handleTranscribe}
+              />
 
               <div className="border-t border-gray-200 pt-6">
                 <AudioLibrary onSelect={(audioUrl) => {
