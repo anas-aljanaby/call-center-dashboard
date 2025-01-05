@@ -19,24 +19,29 @@ interface SidebarProps {
   onTranscriptionComplete: (segments: Segment[]) => void;
 }
 
+interface AudioFileInfo {
+  file: File | null;
+  url: string;
+}
+
 export default function Sidebar({ onFileSelect, onTranscriptionComplete }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [audioInfo, setAudioInfo] = useState<AudioFileInfo>({ file: null, url: '' });
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      setFile(selectedFile);
-      setError(null);
       const audioUrl = URL.createObjectURL(selectedFile);
+      setAudioInfo({ file: selectedFile, url: audioUrl });
+      setError(null);
       onFileSelect(audioUrl);
     }
   };
 
   const handleTranscribe = async () => {
-    if (!file) {
+    if (!audioInfo.url) {
       setError('Please select an audio file first');
       return;
     }
@@ -44,10 +49,19 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
     setIsTranscribing(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
+      let formData = new FormData();
+      
+      if (audioInfo.file) {
+        // For newly uploaded files
+        formData.append('file', audioInfo.file);
+      } else {
+        // For files from the library
+        const response = await fetch(audioInfo.url);
+        const blob = await response.blob();
+        formData.append('file', blob, audioInfo.url.split('/').pop() || 'audio.mp3');
+      }
+
       const response = await fetch('http://localhost:8000/api/transcribe', {
         method: 'POST',
         body: formData,
@@ -108,7 +122,7 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
                 />
                 {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                 
-                {file && !isTranscribing && (
+                {audioInfo.file && !isTranscribing && (
                   <button
                     onClick={handleTranscribe}
                     className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-semibold 
@@ -128,7 +142,7 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
 
               <UploadedAudioList 
                 onSelect={(audioUrl) => {
-                  setFile(null);
+                  setAudioInfo({ file: null, url: audioUrl });
                   onFileSelect(audioUrl);
                 }}
                 onTranscribe={handleTranscribe}
@@ -136,7 +150,7 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
 
               <div className="border-t border-gray-200 pt-6">
                 <AudioLibrary onSelect={(audioUrl) => {
-                  setFile(null);
+                  setAudioInfo({ file: null, url: audioUrl });
                   onFileSelect(audioUrl);
                 }} />
               </div>
@@ -168,7 +182,7 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
               className="hidden"
             />
 
-            {file && (
+            {audioInfo.file && (
               <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
                 <div className="w-3 h-3 bg-blue-500 rounded-full" />
               </div>
