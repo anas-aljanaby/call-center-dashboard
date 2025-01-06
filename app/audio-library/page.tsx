@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { BiUpload, BiFile } from 'react-icons/bi';
+import { supabase } from '../lib/supabase';
 
 interface AudioFile {
   id: string;
@@ -8,17 +9,7 @@ interface AudioFile {
   size: string;
   uploadDate: string;
   status: 'processing' | 'ready' | 'failed';
-  path?: string;
-}
-
-interface ServerAudioFile {
-  id: string;
-  originalName: string;
-  filename: string;
-  size: number;
-  uploadDate: string;
-  status: 'processing' | 'ready' | 'failed';
-  path: string;
+  url?: string;
 }
 
 const AudioSkeleton = () => (
@@ -46,33 +37,43 @@ export default function AudioLibraryPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load existing files when component mounts
   useEffect(() => {
-    const loadExistingFiles = async () => {
-      try {
-        const response = await fetch('/api/files');
-        if (!response.ok) throw new Error('Failed to load files');
-        const data: ServerAudioFile[] = await response.json();
-        
-        const formattedFiles: AudioFile[] = data.map(file => ({
-          id: file.id,
-          name: file.originalName,
-          size: formatFileSize(file.size),
-          uploadDate: new Date(file.uploadDate).toLocaleDateString(),
-          status: file.status,
-          path: file.path
-        }));
-
-        setAudioFiles(formattedFiles);
-      } catch (error) {
-        console.error('Error loading files:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadExistingFiles();
   }, []);
+
+  const loadExistingFiles = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.error('User not authenticated');
+        return;
+      }
+
+      const { data: files, error } = await supabase
+        .from('audio_files')
+        .select('*')
+        .eq('customer_id', session.user.id)
+        .order('uploaded_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedFiles: AudioFile[] = files.map(file => ({
+        id: file.id,
+        name: file.file_name,
+        size: 'N/A',
+        uploadDate: new Date(file.uploaded_at).toLocaleDateString(),
+        status: 'ready',
+        url: file.file_url
+      }));
+
+      setAudioFiles(formattedFiles);
+    } catch (error) {
+      console.error('Error loading files:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -96,16 +97,24 @@ export default function AudioLibraryPage() {
   };
 
   const handleFiles = async (files: File[]) => {
-    // Filter out duplicates before creating new audio files
+    // Check authentication first
+    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    
+    if (!session || authError) {
+      console.error('User not authenticated');
+      return;
+    }
+
+    const userId = session.user.id;
+
     const newFiles = files.filter(file => !audioFiles.some(
       existingFile => existingFile.name === file.name && existingFile.status === 'ready'
     ));
 
-    // If no new files after filtering duplicates, return early
     if (newFiles.length === 0) return;
 
     const newAudioFiles: AudioFile[] = newFiles.map(file => ({
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       name: file.name,
       size: formatFileSize(file.size),
       uploadDate: new Date().toLocaleDateString(),
@@ -114,40 +123,55 @@ export default function AudioLibraryPage() {
 
     setAudioFiles(prev => [...prev, ...newAudioFiles]);
 
-    // Upload each file
     for (const [index, file] of newFiles.entries()) {
-      const formData = new FormData();
-      formData.append('file', file);
-
       try {
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
+        // Upload file to Supabase Storage
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('audio-files')
+          .upload(fileName, file);
 
-        if (!response.ok) {
-          throw new Error('Upload failed');
-        }
+        if (uploadError) throw uploadError;
 
-        const uploadedFile: ServerAudioFile = await response.json();
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('audio-files')
+          .getPublicUrl(fileName);
 
-        // Update the status of the uploaded file
+        // Insert record into database with customer_id
+        const { data: dbData, error: dbError } = await supabase
+          .from('audio_files')
+          .insert([{
+            file_name: file.name,
+            file_url: publicUrl,
+            customer_id: userId,
+            transcription: null,
+            summary: null
+          }])
+          .select()
+          .single();
+
+        if (dbError) throw dbError;
+
+        // Update UI
         setAudioFiles(prev => prev.map(audioFile => 
           audioFile.id === newAudioFiles[index].id
             ? {
                 ...audioFile,
+                id: dbData.id,
                 status: 'ready',
-                path: uploadedFile.path
+                url: publicUrl
               }
             : audioFile
         ));
       } catch (error) {
+        console.error('Error uploading file:', error);
         setAudioFiles(prev => prev.map(audioFile => 
           audioFile.id === newAudioFiles[index].id
             ? { ...audioFile, status: 'failed' }
             : audioFile
         ));
-        console.error('Error uploading file:', error);
       }
     }
   };
@@ -165,7 +189,6 @@ export default function AudioLibraryPage() {
       <div className="max-w-7xl mx-auto">
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Audio Library</h1>
         
-        {/* Upload Area */}
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center mb-8 transition-colors bg-white
             ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}
@@ -189,7 +212,6 @@ export default function AudioLibraryPage() {
           </label>
         </div>
 
-        {/* Files List */}
         <div className="bg-white rounded-lg shadow">
           <div className="px-4 py-3 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-800">Uploaded Files</h2>
