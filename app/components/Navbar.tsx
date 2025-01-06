@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BiSpreadsheet, BiHeadphone, BiBarChartAlt2, BiData, BiCheckSquare, BiTrendingUp, BiSupport, BiPieChartAlt } from 'react-icons/bi';
+import { supabase } from '../lib/supabase';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -12,6 +13,9 @@ interface NavItemProps {
 
 const Navbar = () => {
   const pathname = usePathname();
+  
+  // Set analyze as active if we're on the analyze page or root
+  const isAnalyzeActive = pathname === '/analyze' || pathname === '/';
 
   return (
     <nav className="bg-white border-b border-gray-200 px-4 py-2.5">
@@ -31,8 +35,8 @@ const Navbar = () => {
             <NavItem 
               icon={<BiData />} 
               text="Analyze"  
-              href="/"
-              isActive={pathname === '/'} 
+              href="/analyze"
+              isActive={isAnalyzeActive} 
             />
             <NavItem 
               icon={<BiCheckSquare />} 
@@ -55,6 +59,15 @@ const Navbar = () => {
             <BiCheckSquare className="w-5 h-5 text-gray-600" />
           </button>
           <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+          <button 
+            onClick={async () => {
+              await supabase.auth.signOut();
+              window.location.href = '/';
+            }} 
+            className="p-2 hover:bg-gray-100 rounded-full text-gray-600"
+          >
+            Sign Out
+          </button>
         </div>
       </div>
     </nav>
