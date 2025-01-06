@@ -2,6 +2,7 @@
 
 import "./globals.css";
 import Navbar from "./components/Navbar";
+import AuthGuard from "./components/AuthGuard";
 import { usePathname } from 'next/navigation';
 
 export default function RootLayout({
@@ -15,14 +16,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="flex flex-col h-screen">
-          {showNavbar && <Navbar />}
-          <div className="flex flex-1">
-            <main className="flex-1">
-              {children}
-            </main>
+        <AuthGuard>
+          <div className="flex flex-col h-screen">
+            {showNavbar && <Navbar />}
+            <div className="flex flex-1">
+              <main className="flex-1">
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
+        </AuthGuard>
       </body>
     </html>
   );
