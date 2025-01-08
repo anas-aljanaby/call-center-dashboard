@@ -13,9 +13,12 @@ interface ConversationTimelineProps {
   duration: number;
 }
 
-const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments, duration }) => {
+const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments =[], duration }) => {
   const PIXELS_PER_SECOND = 20;
   const totalWidth = duration * PIXELS_PER_SECOND;
+
+  // Ensure segments is an array
+  const safeSegments = Array.isArray(segments) ? segments : [];
 
   const getSegmentWidth = (start: number, end: number) => {
     return (end - start) * PIXELS_PER_SECOND;
@@ -39,7 +42,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments, d
         <div className="relative h-full ml-24" style={{ width: `${Math.max(totalWidth, 800)}px` }}>
           <div className="absolute left-0 right-0 top-1/2 border-t border-gray-300"></div>
           <div className="absolute left-0 right-0 top-1/2 border-t border-gray-300" style={{ top: 'calc(50% + 10px)' }}></div>
-          {segments.map((segment, index) => (
+          {safeSegments.map((segment, index) => (
             <div
               key={index}
               className={`absolute h-2 ${

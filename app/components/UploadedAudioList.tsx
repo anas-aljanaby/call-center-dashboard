@@ -5,11 +5,10 @@ import { BiFile } from 'react-icons/bi';
 import { useAudioFiles } from '../hooks/useAudioFiles';
 
 interface UploadedAudioListProps {
-  onSelect: (audioUrl: string) => void;
-  onTranscribe: () => void;
+  onSelect: (file: AudioFile) => void;
 }
 
-const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTranscribe }) => {
+const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
   const { audioFiles, isLoading, error, refreshFiles } = useAudioFiles();
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
 
@@ -19,7 +18,7 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
 
   const handleFileSelect = (file: AudioFile) => {
     setSelectedFileId(file.id);
-    onSelect(file.file_url);
+    onSelect(file);
   };
 
   const formatDate = (dateString: string) => {
@@ -84,15 +83,6 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
           )}
         </div>
       </div>
-      {selectedFileId && (
-        <button
-          onClick={onTranscribe}
-          className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-semibold 
-                   hover:bg-blue-700 transition-colors"
-        >
-          Transcribe Selected Audio
-        </button>
-      )}
     </div>
   );
 };

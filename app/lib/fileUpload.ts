@@ -4,6 +4,7 @@ interface UploadResult {
   fileId: string;
   publicUrl: string;
   segments?: any[];
+  key_events?: string[];
   error?: string;
 }
 
@@ -53,7 +54,7 @@ export async function uploadAudioFile(
 
     // Start transcription
     onProgress?.('transcribing');
-    const response = await fetch('http://localhost:8000/api/transcribe-dummy', {
+    const response = await fetch('http://localhost:8000/api/transcribe', {
       method: 'POST',
       body: (() => {
         const formData = new FormData();
@@ -77,6 +78,21 @@ export async function uploadAudioFile(
       })
       .eq('id', dbData.id);
 
+    // Get key events
+    const eventsResponse = await fetch('http://localhost:8000/api/analyze-events', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ segments: transcriptionResult.segments }),
+    });
+
+    if (!eventsResponse.ok) {
+      throw new Error(`Events analysis failed: ${eventsResponse.statusText}`);
+    }
+
+    const eventsResult = await eventsResponse.json();
+
     // Start summarization
     onProgress?.('summarizing');
     const summaryResponse = await fetch('http://localhost:8000/api/summarize-conversation', {
@@ -93,11 +109,12 @@ export async function uploadAudioFile(
 
     const summaryResult = await summaryResponse.json();
 
-    // Update summary in database
+    // Update summary and key events in database
     await supabase
       .from('audio_files')
       .update({
         summary: summaryResult.summary,
+        key_events: eventsResult.key_events,
         status: 'ready'
       })
       .eq('id', dbData.id);
@@ -106,7 +123,9 @@ export async function uploadAudioFile(
 
     return {
       fileId: dbData.id,
-      publicUrl
+      publicUrl,
+      segments: transcriptionResult.segments,
+      key_events: eventsResult.key_events
     };
 
   } catch (error) {

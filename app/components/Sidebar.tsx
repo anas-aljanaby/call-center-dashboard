@@ -15,11 +15,10 @@ interface Segment {
 }
 
 interface SidebarProps {
-  onFileSelect: (audioUrl: string) => void;
-  onTranscriptionComplete: (segments: Segment[]) => void;
+  onFileSelect: (file: AudioFile) => void;
 }
 
-export default function Sidebar({ onFileSelect, onTranscriptionComplete }: SidebarProps) {
+export default function Sidebar({ onFileSelect }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { uploadFiles, isLoading, error } = useAudioFiles();
 
@@ -28,8 +27,6 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
     if (!selectedFile) return;
 
     try {
-      const audioUrl = URL.createObjectURL(selectedFile);
-      onFileSelect(audioUrl);
       await uploadFiles([selectedFile]);
     } catch (err) {
       console.error('Error processing file:', err);
@@ -83,10 +80,9 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
               </div>
 
               <UploadedAudioList 
-                onSelect={(audioUrl) => {
-                  onFileSelect(audioUrl);
+                onSelect={(file) => {
+                  onFileSelect(file);
                 }}
-                onTranscribe={() => {}}
               />
             </div>
           </div>

@@ -13,17 +13,20 @@ interface ConversationSegmentsProps {
   segments: Segment[];
 }
 
-const ConversationSegments: React.FC<ConversationSegmentsProps> = ({ segments }) => {
+const ConversationSegments: React.FC<ConversationSegmentsProps> = ({ segments = [] }) => {
   const formatTime = (time: number): string => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  // Ensure segments is an array
+  const safeSegments = Array.isArray(segments) ? segments : [];
+
   return (
     <div className="w-full h-full flex flex-col">
       <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-        {segments.map((segment, index) => (
+        {safeSegments.map((segment, index) => (
           <div key={index} className="mb-4">
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
