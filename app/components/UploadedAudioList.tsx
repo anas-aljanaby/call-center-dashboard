@@ -1,23 +1,13 @@
 import { useState, useEffect } from 'react';
 import { BiFile } from 'react-icons/bi';
+import { supabase } from '../lib/supabase';
 
 interface AudioFile {
   id: string;
-  name: string;
-  size: string;
-  uploadDate: string;
-  status: 'processing' | 'ready' | 'failed';
-  path?: string;
-}
-
-interface ServerAudioFile {
-  id: string;
-  originalName: string;
-  filename: string;
-  size: number;
-  uploadDate: string;
-  status: 'processing' | 'ready' | 'failed';
-  path: string;
+  file_name: string;
+  file_url: string;
+  uploaded_at: string;
+  transcription_status: 'pending' | 'completed' | 'failed';
 }
 
 interface UploadedAudioListProps {
@@ -36,20 +26,22 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
 
   const loadExistingFiles = async () => {
     try {
-      const response = await fetch('/api/files');
-      if (!response.ok) throw new Error('Failed to load files');
-      const data: ServerAudioFile[] = await response.json();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      const formattedFiles: AudioFile[] = data.map(file => ({
-        id: file.id,
-        name: file.originalName,
-        size: formatFileSize(file.size),
-        uploadDate: new Date(file.uploadDate).toLocaleDateString(),
-        status: file.status,
-        path: file.path
-      }));
+      if (!session) {
+        console.error('User not authenticated');
+        return;
+      }
 
-      setAudioFiles(formattedFiles);
+      const { data: files, error } = await supabase
+        .from('audio_files')
+        .select('*')
+        .eq('customer_id', session.user.id)
+        .order('uploaded_at', { ascending: false });
+
+      if (error) throw error;
+
+      setAudioFiles(files || []);
     } catch (error) {
       console.error('Error loading files:', error);
     } finally {
@@ -57,19 +49,13 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
     }
   };
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
   const handleFileSelect = (file: AudioFile) => {
     setSelectedFileId(file.id);
-    if (file.path) {
-      onSelect(file.path);
-    }
+    onSelect(file.file_url);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
@@ -93,9 +79,23 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
                   <div className="flex items-center gap-2">
                     <BiFile className="text-gray-400" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                      <p className="text-xs text-gray-500">{file.uploadDate}</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {file.file_name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formatDate(file.uploaded_at)}
+                      </p>
                     </div>
+                    {/* <span className={`px-2 py-1 text-xs rounded-full ${
+                      file.transcription_status === 'completed'
+                        ? 'bg-green-100 text-green-800'
+                        : file.transcription_status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                    }`}>
+                      {file.transcription_status.charAt(0).toUpperCase() + 
+                       file.transcription_status.slice(1)}
+                    </span> */}
                   </div>
                 </div>
               ))}
@@ -111,7 +111,8 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
       {selectedFileId && (
         <button
           onClick={onTranscribe}
-          className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+          className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-semibold 
+                   hover:bg-blue-700 transition-colors"
         >
           Transcribe Selected Audio
         </button>

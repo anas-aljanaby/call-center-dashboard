@@ -10,6 +10,8 @@ interface AudioFile {
   uploadDate: string;
   status: 'processing' | 'ready' | 'failed';
   url?: string;
+  transcription_status?: 'pending' | 'completed' | 'failed';
+  transcription?: any;
 }
 
 const AudioSkeleton = () => (
@@ -139,7 +141,7 @@ export default function AudioLibraryPage() {
           .from('audio-files')
           .getPublicUrl(fileName);
 
-        // Insert record into database with customer_id
+        // Insert record into database with transcription_status
         const { data: dbData, error: dbError } = await supabase
           .from('audio_files')
           .insert([{
@@ -147,6 +149,7 @@ export default function AudioLibraryPage() {
             file_url: publicUrl,
             customer_id: userId,
             transcription: null,
+            transcription_status: 'pending',
             summary: null
           }])
           .select()
@@ -161,10 +164,15 @@ export default function AudioLibraryPage() {
                 ...audioFile,
                 id: dbData.id,
                 status: 'ready',
-                url: publicUrl
+                url: publicUrl,
+                transcription_status: 'pending'
               }
             : audioFile
         ));
+
+        // Initiate transcription process
+        initiateTranscription(publicUrl, dbData.id);
+
       } catch (error) {
         console.error('Error uploading file:', error);
         setAudioFiles(prev => prev.map(audioFile => 
@@ -182,6 +190,78 @@ export default function AudioLibraryPage() {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const initiateTranscription = async (audioUrl: string, fileId: string) => {
+    try {
+      // Download the file from the public URL
+      const response = await fetch(audioUrl);
+      const blob = await response.blob();
+
+      // Create form data with the audio file
+      const formData = new FormData();
+      formData.append('file', blob, 'audio.mp3');
+
+      // Start transcription
+      const transcriptionResponse = await fetch('http://localhost:8000/api/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!transcriptionResponse.ok) {
+        throw new Error('Transcription failed to start');
+      }
+
+      // Get the transcription result
+      const result = await transcriptionResponse.json();
+
+      // Update the database with the transcription
+      const { error: updateError } = await supabase
+        .from('audio_files')
+        .update({
+          transcription: result.segments,
+          transcription_status: 'completed'
+        })
+        .eq('id', fileId);
+
+      if (updateError) throw updateError;
+      else {
+        console.log('Transcription completed');
+        console.log(result.segments);
+      }
+
+      // Update UI
+      setAudioFiles(prev => prev.map(audioFile => 
+        audioFile.id === fileId
+          ? {
+              ...audioFile,
+              transcription: result.segments,
+              transcription_status: 'completed'
+            }
+          : audioFile
+      ));
+
+    } catch (error) {
+      console.error('Transcription error:', error);
+      
+      // Update database with failed status
+      await supabase
+        .from('audio_files')
+        .update({
+          transcription_status: 'failed'
+        })
+        .eq('id', fileId);
+
+      // Update UI with failed status
+      setAudioFiles(prev => prev.map(audioFile => 
+        audioFile.id === fileId
+          ? {
+              ...audioFile,
+              transcription_status: 'failed'
+            }
+          : audioFile
+      ));
+    }
   };
 
   return (
@@ -233,14 +313,26 @@ export default function AudioLibraryPage() {
                     <div className="flex items-center space-x-4">
                       <span className="text-sm text-gray-500">{file.uploadDate}</span>
                       <span className={`px-2 py-1 text-xs rounded-full ${
-                        file.status === 'ready' ? 'bg-green-100 text-green-800' :
-                        file.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
+                        file.status === 'ready' 
+                          ? file.transcription_status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : file.transcription_status === 'completed'
+                              ? 'bg-green-100 text-green-800'
+                              : file.transcription_status === 'failed'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
+                          : file.status === 'processing'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
                       }`}>
-                        {file.status.charAt(0).toUpperCase() + file.status.slice(1)}
+                        {file.transcription_status === 'pending' ? 'Transcribing...' :
+                         file.transcription_status === 'completed' ? 'Transcribed' :
+                         file.transcription_status === 'failed' ? 'Transcription Failed' :
+                         file.status.charAt(0).toUpperCase() + file.status.slice(1)}
                       </span>
                     </div>
                   </div>
+                  
                 ))}
                 {audioFiles.length === 0 && (
                   <div className="p-4 text-center text-gray-500">

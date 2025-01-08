@@ -5,6 +5,7 @@ import { BiChevronLeft, BiChevronRight, BiUpload } from 'react-icons/bi';
 import { BrainCircuit } from 'lucide-react';
 import AudioLibrary from './AudioLibrary';
 import UploadedAudioList from './UploadedAudioList';
+import { supabase } from '../lib/supabase';
 
 interface Segment {
   text: string;
@@ -30,55 +31,84 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      const audioUrl = URL.createObjectURL(selectedFile);
-      setAudioInfo({ file: selectedFile, url: audioUrl });
-      setError(null);
-      onFileSelect(audioUrl);
-    }
-  };
-
-  const handleTranscribe = async () => {
-    if (!audioInfo.url) {
-      setError('Please select an audio file first');
-      return;
-    }
-
-    setIsTranscribing(true);
-    setError(null);
+    if (!selectedFile) return;
 
     try {
-      let formData = new FormData();
-      
-      if (audioInfo.file) {
-        // For newly uploaded files
-        formData.append('file', audioInfo.file);
-      } else {
-        // For files from the library
-        const response = await fetch(audioInfo.url);
-        const blob = await response.blob();
-        formData.append('file', blob, audioInfo.url.split('/').pop() || 'audio.mp3');
+      // Check authentication
+      const { data: { session }, error: authError } = await supabase.auth.getSession();
+      if (!session || authError) {
+        setError('User not authenticated');
+        return;
       }
+
+      // Create temporary URL for preview
+      const audioUrl = URL.createObjectURL(selectedFile);
+      setAudioInfo({ file: selectedFile, url: audioUrl });
+      onFileSelect(audioUrl);
+      setIsTranscribing(true);
+
+      // Upload to Supabase Storage
+      const fileName = `${Date.now()}-${selectedFile.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('audio-files')
+        .upload(fileName, selectedFile);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('audio-files')
+        .getPublicUrl(fileName);
+
+      // Insert record into database
+      const { data: dbData, error: dbError } = await supabase
+        .from('audio_files')
+        .insert([{
+          file_name: selectedFile.name,
+          file_url: publicUrl,
+          customer_id: session.user.id,
+          transcription: null,
+          transcription_status: 'pending',
+          summary: null
+        }])
+        .select()
+        .single();
+
+      if (dbError) throw dbError;
+
+      // Start transcription
+      const formData = new FormData();
+      formData.append('file', selectedFile);
 
       const response = await fetch('http://localhost:8000/api/transcribe', {
         method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
       const result = await response.json();
-      if (result.segments && result.segments.length > 0) {
-        onTranscriptionComplete(result.segments);
-      } else {
+      if (!result.segments || result.segments.length === 0) {
         throw new Error('No transcription segments received');
       }
+
+      // Update database with transcription
+      await supabase
+        .from('audio_files')
+        .update({
+          transcription: result.segments,
+          transcription_status: 'completed'
+        })
+        .eq('id', dbData.id);
+
+      // Update UI with transcription
+      onTranscriptionComplete(result.segments);
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during transcription');
+      console.error('Error processing file:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred processing the file');
     } finally {
       setIsTranscribing(false);
     }
@@ -122,20 +152,10 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
                 />
                 {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                 
-                {audioInfo.file && !isTranscribing && (
-                  <button
-                    onClick={handleTranscribe}
-                    className="mt-4 w-full py-2 px-4 bg-blue-600 text-white rounded-lg text-sm font-semibold 
-                             hover:bg-blue-700 transition-colors"
-                  >
-                    Transcribe Audio
-                  </button>
-                )}
-                
                 {isTranscribing && (
                   <div className="mt-4 flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-sm text-gray-600">Transcribing...</span>
+                    <span className="ml-2 text-sm text-gray-600">Processing audio...</span>
                   </div>
                 )}
               </div>
@@ -145,22 +165,13 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
                   setAudioInfo({ file: null, url: audioUrl });
                   onFileSelect(audioUrl);
                 }}
-                onTranscribe={handleTranscribe}
+                onTranscribe={() => {}}
               />
-
-              <div className="border-t border-gray-200 pt-6">
-                <AudioLibrary onSelect={(audioUrl) => {
-                  setAudioInfo({ file: null, url: audioUrl });
-                  onFileSelect(audioUrl);
-                }} />
-              </div>
             </div>
           </div>
         ) : (
           <div className={`flex flex-col items-center space-y-6 transition-all duration-300 ${
-            isCollapsed 
-            ? 'opacity-100 visible' 
-            : 'opacity-0 invisible w-0 delay-150'
+            isCollapsed ? 'opacity-100 visible' : 'opacity-0 invisible w-0 delay-150'
           }`}>
             <div className="flex flex-col items-center gap-2 mt-4">
               <BrainCircuit size={24} className="text-gray-600" />
@@ -181,12 +192,6 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
               onChange={handleFileChange}
               className="hidden"
             />
-
-            {audioInfo.file && (
-              <div className="w-8 h-8 bg-blue-50 rounded-full flex items-center justify-center">
-                <div className="w-3 h-3 bg-blue-500 rounded-full" />
-              </div>
-            )}
 
             {isTranscribing && (
               <div className="w-8 h-8 flex items-center justify-center">
