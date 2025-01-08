@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BiChevronLeft, BiChevronRight, BiUpload } from 'react-icons/bi';
 import { BrainCircuit } from 'lucide-react';
-import AudioLibrary from './AudioLibrary';
 import UploadedAudioList from './UploadedAudioList';
-import { supabase } from '../lib/supabase';
+import { useAudioFiles } from '../hooks/useAudioFiles';
 
 interface Segment {
   text: string;
@@ -20,97 +19,20 @@ interface SidebarProps {
   onTranscriptionComplete: (segments: Segment[]) => void;
 }
 
-interface AudioFileInfo {
-  file: File | null;
-  url: string;
-}
-
 export default function Sidebar({ onFileSelect, onTranscriptionComplete }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [audioInfo, setAudioInfo] = useState<AudioFileInfo>({ file: null, url: '' });
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { uploadFiles, isLoading, error } = useAudioFiles();
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
     try {
-      // Check authentication
-      const { data: { session }, error: authError } = await supabase.auth.getSession();
-      if (!session || authError) {
-        setError('User not authenticated');
-        return;
-      }
-
-      // Create temporary URL for preview
       const audioUrl = URL.createObjectURL(selectedFile);
-      setAudioInfo({ file: selectedFile, url: audioUrl });
       onFileSelect(audioUrl);
-      setIsTranscribing(true);
-
-      // Upload to Supabase Storage
-      const fileName = `${Date.now()}-${selectedFile.name}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('audio-files')
-        .upload(fileName, selectedFile);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('audio-files')
-        .getPublicUrl(fileName);
-
-      // Insert record into database
-      const { data: dbData, error: dbError } = await supabase
-        .from('audio_files')
-        .insert([{
-          file_name: selectedFile.name,
-          file_url: publicUrl,
-          customer_id: session.user.id,
-          transcription: null,
-          transcription_status: 'pending',
-          summary: null
-        }])
-        .select()
-        .single();
-
-      if (dbError) throw dbError;
-
-      // Start transcription
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-
-      const response = await fetch('http://localhost:8000/api/transcribe', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-
-      const result = await response.json();
-      if (!result.segments || result.segments.length === 0) {
-        throw new Error('No transcription segments received');
-      }
-
-      // Update database with transcription
-      await supabase
-        .from('audio_files')
-        .update({
-          transcription: result.segments,
-          transcription_status: 'completed'
-        })
-        .eq('id', dbData.id);
-
-      // Update UI with transcription
-      onTranscriptionComplete(result.segments);
-
+      await uploadFiles([selectedFile]);
     } catch (err) {
       console.error('Error processing file:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred processing the file');
-    } finally {
-      setIsTranscribing(false);
     }
   };
 
@@ -152,7 +74,7 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
                 />
                 {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
                 
-                {isTranscribing && (
+                {isLoading && (
                   <div className="mt-4 flex items-center justify-center">
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                     <span className="ml-2 text-sm text-gray-600">Processing audio...</span>
@@ -162,7 +84,6 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
 
               <UploadedAudioList 
                 onSelect={(audioUrl) => {
-                  setAudioInfo({ file: null, url: audioUrl });
                   onFileSelect(audioUrl);
                 }}
                 onTranscribe={() => {}}
@@ -193,7 +114,7 @@ export default function Sidebar({ onFileSelect, onTranscriptionComplete }: Sideb
               className="hidden"
             />
 
-            {isTranscribing && (
+            {isLoading && (
               <div className="w-8 h-8 flex items-center justify-center">
                 <svg className="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

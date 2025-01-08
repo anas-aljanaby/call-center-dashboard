@@ -27,7 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODEL = "gpt-4o"
+MODEL = "gpt-3.5-turbo"
 
 NEURALSPACE_API_KEY = os.getenv('NEURALSPACE_API_KEY')
 if not NEURALSPACE_API_KEY:

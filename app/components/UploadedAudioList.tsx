@@ -1,14 +1,8 @@
-import { useState, useEffect } from 'react';
-import { BiFile } from 'react-icons/bi';
-import { supabase } from '../lib/supabase';
+"use client";
 
-interface AudioFile {
-  id: string;
-  file_name: string;
-  file_url: string;
-  uploaded_at: string;
-  transcription_status: 'pending' | 'completed' | 'failed';
-}
+import { useEffect, useState } from 'react';
+import { BiFile } from 'react-icons/bi';
+import { useAudioFiles } from '../hooks/useAudioFiles';
 
 interface UploadedAudioListProps {
   onSelect: (audioUrl: string) => void;
@@ -16,38 +10,12 @@ interface UploadedAudioListProps {
 }
 
 const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTranscribe }) => {
-  const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
+  const { audioFiles, isLoading, error, refreshFiles } = useAudioFiles();
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadExistingFiles();
-  }, []);
-
-  const loadExistingFiles = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        console.error('User not authenticated');
-        return;
-      }
-
-      const { data: files, error } = await supabase
-        .from('audio_files')
-        .select('*')
-        .eq('customer_id', session.user.id)
-        .order('uploaded_at', { ascending: false });
-
-      if (error) throw error;
-
-      setAudioFiles(files || []);
-    } catch (error) {
-      console.error('Error loading files:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    refreshFiles();
+  }, [refreshFiles]);
 
   const handleFileSelect = (file: AudioFile) => {
     setSelectedFileId(file.id);
@@ -58,6 +26,17 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
     return new Date(dateString).toLocaleDateString();
   };
 
+  const getStatusStyle = (status: AudioFile['status']) => {
+    const styles = {
+      ready: 'bg-green-100 text-green-800',
+      processing: 'bg-yellow-100 text-yellow-800',
+      transcribing: 'bg-blue-100 text-blue-800',
+      summarizing: 'bg-purple-100 text-purple-800',
+      failed: 'bg-red-100 text-red-800'
+    };
+    return styles[status] || styles.failed;
+  };
+
   return (
     <div className="flex flex-col h-96">
       <h3 className="text-lg font-semibold text-gray-700 mb-2">Uploaded Audio Files</h3>
@@ -65,12 +44,14 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
         <div className="p-2 space-y-2">
           {isLoading ? (
             <div className="text-sm text-gray-500 p-2">Loading...</div>
+          ) : error ? (
+            <div className="text-sm text-red-500 p-2">{error}</div>
           ) : (
             <>
               {audioFiles.map(file => (
                 <div
                   key={file.id}
-                  className={`p-3 rounded-lg border transition-colors cursor-pointer
+                  className={`p-3 rounded-lg border transition-colors cursor-pointer relative
                     ${selectedFileId === file.id 
                       ? 'border-blue-500 bg-blue-50' 
                       : 'border-gray-200 hover:bg-gray-50'}`}
@@ -86,16 +67,11 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, onTrans
                         {formatDate(file.uploaded_at)}
                       </p>
                     </div>
-                    {/* <span className={`px-2 py-1 text-xs rounded-full ${
-                      file.transcription_status === 'completed'
-                        ? 'bg-green-100 text-green-800'
-                        : file.transcription_status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                    }`}>
-                      {file.transcription_status.charAt(0).toUpperCase() + 
-                       file.transcription_status.slice(1)}
-                    </span> */}
+                  </div>
+                  <div className="absolute bottom-2 right-2">
+                    <span className={`px-2 py-1 text-xs rounded-full ${getStatusStyle(file.status)}`}>
+                      {file.status.charAt(0).toUpperCase() + file.status.slice(1)}
+                    </span>
                   </div>
                 </div>
               ))}

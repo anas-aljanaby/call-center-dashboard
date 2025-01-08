@@ -1,17 +1,8 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { AudioFile } from '../types/audio';
 
 const DB_PATH = path.join(process.cwd(), 'data', 'audio-files.json');
-
-export interface AudioFile {
-  id: string;
-  originalName: string;
-  filename: string;
-  size: number;
-  uploadDate: string;
-  status: 'processing' | 'ready' | 'failed';
-  path: string;
-}
 
 export class AudioFileDB {
   private static async ensureDbExists() {
