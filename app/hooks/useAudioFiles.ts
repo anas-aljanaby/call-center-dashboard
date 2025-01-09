@@ -2,23 +2,44 @@ import { useState, useCallback, useEffect } from 'react';
 import { AudioFile } from '../types/audio';
 import { uploadAudioFile } from '../lib/fileUpload';
 import { fetchUserAudioFiles } from '../lib/audioFiles';
+import { supabase } from '../lib/supabase';
 
 export function useAudioFiles() {
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refreshFiles = useCallback(async () => {
     setIsLoading(true);
+    setError(null);
     const { files, error } = await fetchUserAudioFiles();
     
     if (error) {
       console.error('Error loading files:', error);
+      setError(error);
     } else {
       setAudioFiles(files);
     }
     
     setIsLoading(false);
   }, []);
+
+  const deleteFile = async (fileId: string) => {
+    try {
+      const { error } = await supabase
+        .from('audio_files')
+        .delete()
+        .eq('id', fileId);
+
+      if (error) throw error;
+
+      // Update local state
+      setAudioFiles(prev => prev.filter(file => file.id !== fileId));
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      throw error;
+    }
+  };
 
   const uploadFiles = async (files: File[]) => {
     const newFiles = files.filter(file => !audioFiles.some(
@@ -78,7 +99,9 @@ export function useAudioFiles() {
   return {
     audioFiles,
     isLoading,
+    error,
     uploadFiles,
-    refreshFiles
+    refreshFiles,
+    deleteFile
   };
 } 

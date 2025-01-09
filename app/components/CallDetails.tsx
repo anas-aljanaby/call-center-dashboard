@@ -28,7 +28,7 @@ const dummyCallInfo: CallInfo = {
   durationMinutes: "3:11"
 };
 
-type Tab = 'insights' | 'info' | 'summary';
+type Tab = 'insights' | 'summary' | 'info';
 
 interface CallDetailsProps {
   keyEvents?: string[];
@@ -36,7 +36,7 @@ interface CallDetailsProps {
 }
 
 export default function CallDetails({ keyEvents = [], summary = '' }: CallDetailsProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('info');
+  const [activeTab, setActiveTab] = useState<Tab>('insights');
 
   return (
     <div className="flex w-80 min-w-[320px] border-r border-gray-200">
@@ -50,16 +50,16 @@ export default function CallDetails({ keyEvents = [], summary = '' }: CallDetail
             <BiLineChart size={24} />
           </button>
           <button
-            onClick={() => setActiveTab('info')}
-            className={`p-2 rounded-lg ${activeTab === 'info' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-200'}`}
-          >
-            <BiInfoCircle size={24} />
-          </button>
-          <button
             onClick={() => setActiveTab('summary')}
             className={`p-2 rounded-lg ${activeTab === 'summary' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-200'}`}
           >
             <BiBot size={24} />
+          </button>
+          <button
+            onClick={() => setActiveTab('info')}
+            className={`p-2 rounded-lg ${activeTab === 'info' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-200'}`}
+          >
+            <BiInfoCircle size={24} />
           </button>
         </div>
       </div>
@@ -70,41 +70,50 @@ export default function CallDetails({ keyEvents = [], summary = '' }: CallDetail
           {activeTab === 'insights' && (
             <div className="space-y-4">
               <h2 className="text-gray-600 text-xl font-semibold mb-6">Key Events</h2>
-              <ul className="space-y-3">
-                {keyEvents.map((event, index) => (
-                  <li key={index} className="flex items-start space-x-2 text-sm text-gray-700">
-                    <span className="min-w-[24px] h-6 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full">
-                      {index + 1}
-                    </span>
-                    <span className="flex-1">{event}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {activeTab === 'info' && (
-            <div className="space-y-4">
-              <h2 className="text-gray-600 text-xl font-semibold mb-6">Call Info</h2>
-              <div className="space-y-4">
-                {Object.entries(dummyCallInfo).map(([key, value]) => (
-                  <div key={key} className="flex justify-between items-center border-b border-gray-200 pb-2">
-                    <div className="text-sm text-gray-600">
-                      {key.replace(/([A-Z])/g, ' $1').trim()}
-                    </div>
-                    <div className="text-gray-900">{value}</div>
-                  </div>
-                ))}
-              </div>
+              {keyEvents.length > 0 ? (
+                <ul className="space-y-3">
+                  {keyEvents.map((event, index) => (
+                    <li key={index} className="flex items-start space-x-2 text-sm text-gray-700">
+                      <span className="min-w-[24px] h-6 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full">
+                        {index + 1}
+                      </span>
+                      <span className="flex-1">{event}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-gray-400">Select a call to view key events and important moments from the conversation.</p>
+              )}
             </div>
           )}
           {activeTab === 'summary' && (
             <div className="space-y-4">
               <h2 className="text-gray-600 text-xl font-semibold mb-6">AI Summary</h2>
               <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {summary || 'No summary available'}
+                {summary || <span className="text-gray-400">Select a call to view an AI-generated summary of the conversation.</span>}
               </p>
             </div>
           )}
+          {activeTab === 'info' && (
+            <div className="space-y-4">
+              <h2 className="text-gray-600 text-xl font-semibold mb-6">Call Info</h2>
+              {Object.keys(dummyCallInfo).length > 0 ? (
+                <div className="space-y-4">
+                  {Object.entries(dummyCallInfo).map(([key, value]) => (
+                    <div key={key} className="flex justify-between items-center border-b border-gray-200 pb-2">
+                      <div className="text-sm text-gray-600">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </div>
+                      <div className="text-gray-900">{value}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">Select a call to view detailed information about the conversation.</p>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
     </div>
