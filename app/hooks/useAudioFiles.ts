@@ -8,6 +8,7 @@ export function useAudioFiles() {
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set());
 
   const refreshFiles = useCallback(async () => {
     setIsLoading(true);
@@ -26,6 +27,9 @@ export function useAudioFiles() {
 
   const deleteFile = async (fileId: string) => {
     try {
+      // Optimistically update UI
+      setDeletingFiles(prev => new Set(prev).add(fileId));
+      
       // First get the file details to get the filename
       const { data: fileData, error: fetchError } = await supabase
         .from('audio_files')
@@ -62,7 +66,19 @@ export function useAudioFiles() {
       setAudioFiles(prev => prev.filter(file => file.id !== fileId));
     } catch (error) {
       console.error('Error deleting file:', error);
+      // Revert optimistic update on error
+      setDeletingFiles(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fileId);
+        return newSet;
+      });
       throw error;
+    } finally {
+      setDeletingFiles(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fileId);
+        return newSet;
+      });
     }
   };
 
@@ -127,6 +143,7 @@ export function useAudioFiles() {
     error,
     uploadFiles,
     refreshFiles,
-    deleteFile
+    deleteFile,
+    deletingFiles
   };
 } 

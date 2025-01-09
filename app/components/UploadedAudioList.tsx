@@ -9,8 +9,24 @@ interface UploadedAudioListProps {
   onSelect: (file: AudioFile) => void;
 }
 
+const AudioItemSkeleton = () => (
+  <div className="p-3 rounded-lg border border-gray-200 animate-pulse">
+    <div className="flex flex-col h-full">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-2 min-w-0 flex-1">
+          <div className="w-4 h-4 bg-gray-200 rounded mt-0.5 flex-shrink-0" />
+          <div className="h-4 bg-gray-200 rounded w-3/4" />
+        </div>
+      </div>
+      <div className="flex justify-between items-end mt-auto pt-2">
+        <div className="h-3 bg-gray-200 rounded w-20" />
+      </div>
+    </div>
+  </div>
+);
+
 const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
-  const { audioFiles, isLoading, error, refreshFiles, deleteFile } = useAudioFiles();
+  const { audioFiles, isLoading, error, refreshFiles, deleteFile, deletingFiles } = useAudioFiles();
   const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -79,7 +95,11 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
       <div className="flex-1 overflow-y-auto border border-gray-200 rounded-lg bg-white">
         <div className="p-2 space-y-2">
           {isLoading ? (
-            <div className="text-sm text-gray-500 p-2">Loading...</div>
+            <>
+              <AudioItemSkeleton />
+              <AudioItemSkeleton />
+              <AudioItemSkeleton />
+            </>
           ) : error ? (
             <div className="text-sm text-red-500 p-2">{error}</div>
           ) : (
@@ -90,8 +110,9 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
                   className={`p-3 rounded-lg border transition-colors cursor-pointer relative group
                     ${selectedFileId === file.id 
                       ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-200 hover:bg-gray-50'}`}
-                  onClick={() => handleFileSelect(file)}
+                      : 'border-gray-200 hover:bg-gray-50'}
+                    ${deletingFiles.has(file.id) ? 'opacity-50' : ''}`}
+                  onClick={() => !deletingFiles.has(file.id) && handleFileSelect(file)}
                 >
                   <div className="flex flex-col h-full ">
                     <div className="flex items-start justify-between">
@@ -123,7 +144,7 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
                       )}
                     </div>
                   </div>
-                  {menuOpenId === file.id && (
+                  {menuOpenId === file.id && !deletingFiles.has(file.id) && (
                     <div 
                       ref={menuRef}
                       className="absolute top-0 right-0 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-10 mt-8"
@@ -134,6 +155,7 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
                           handleDeleteClick(file.id);
                         }}
                         className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        disabled={deletingFiles.has(file.id)}
                       >
                         <BiTrash />
                         Delete
