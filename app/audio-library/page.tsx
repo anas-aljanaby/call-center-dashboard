@@ -1,8 +1,7 @@
 "use client";
-import { useState, useEffect } from 'react';
-import { BiUpload, BiFile } from 'react-icons/bi';
-import { uploadAudioFile } from '../lib/fileUpload';
-import { fetchUserAudioFiles, type AudioFile } from '../lib/audioFiles';
+import { useState, useEffect, useRef } from 'react';
+import { BiUpload, BiFile, BiTrash } from 'react-icons/bi';
+import { AudioFile } from '../types/audio';
 import { useAudioFiles } from '../hooks/useAudioFiles';
 
 const AudioSkeleton = () => (
@@ -25,9 +24,83 @@ const AudioSkeleton = () => (
   </div>
 );
 
+interface DeleteConfirmationDialogProps {
+  isOpen: boolean;
+  fileName?: string;
+  isAllFiles?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+const DeleteConfirmationDialog = ({ isOpen, fileName, isAllFiles, onConfirm, onCancel }: DeleteConfirmationDialogProps) => {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+        onCancel();
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dialogRef.current && !dialogRef.current.contains(e.target as Node)) {
+        onCancel();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onCancel]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div 
+        ref={dialogRef}
+        className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl"
+      >
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Confirm Delete</h3>
+        <p className="text-gray-600 mb-6">
+          {isAllFiles 
+            ? "Are you sure you want to delete all files? This action cannot be undone."
+            : `Are you sure you want to delete "${fileName}"? This action cannot be undone.`
+          }
+        </p>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function AudioLibraryPage() {
   const [isDragging, setIsDragging] = useState(false);
-  const { audioFiles, isLoading, uploadFiles, refreshFiles } = useAudioFiles();
+  const { audioFiles, isLoading, uploadFiles, refreshFiles, deleteFile, deleteAllFiles, deletingFiles } = useAudioFiles();
+  const [fileToDelete, setFileToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [isConfirmingClearAll, setIsConfirmingClearAll] = useState(false);
 
   useEffect(() => {
     refreshFiles();
@@ -65,6 +138,10 @@ export default function AudioLibraryPage() {
     return styles[status] || styles.failed;
   };
 
+  const handleDelete = async (fileId: string, fileName: string) => {
+    setFileToDelete({ id: fileId, name: fileName });
+  };
+
   return (
     <div className="p-6 min-h-screen w-full bg-white">
       <div className="max-w-7xl mx-auto">
@@ -94,8 +171,16 @@ export default function AudioLibraryPage() {
         </div>
 
         <div className="bg-white rounded-lg shadow">
-          <div className="px-4 py-3 border-b border-gray-200">
+          <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">Uploaded Files</h2>
+            {audioFiles.length > 0 && (
+              <button
+                onClick={() => setIsConfirmingClearAll(true)}
+                className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              >
+                Clear All
+              </button>
+            )}
           </div>
           <div className="divide-y divide-gray-200">
             {isLoading ? (
@@ -118,6 +203,14 @@ export default function AudioLibraryPage() {
                       <span className={`px-2 py-1 text-xs rounded-full ${getStatusStyle(file.status)}`}>
                         {file.status.charAt(0).toUpperCase() + file.status.slice(1)}
                       </span>
+                      <button
+                        onClick={() => handleDelete(file.id, file.file_name)}
+                        disabled={deletingFiles.has(file.id)}
+                        className={`p-2 text-red-600 hover:bg-red-50 rounded-full transition-colors
+                          ${deletingFiles.has(file.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      >
+                        <BiTrash className="w-5 h-5" />
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -131,6 +224,29 @@ export default function AudioLibraryPage() {
           </div>
         </div>
       </div>
+      
+      <DeleteConfirmationDialog
+        isOpen={fileToDelete !== null || isConfirmingClearAll}
+        fileName={fileToDelete?.name}
+        isAllFiles={isConfirmingClearAll}
+        onConfirm={async () => {
+          try {
+            if (isConfirmingClearAll) {
+              await deleteAllFiles();
+              setIsConfirmingClearAll(false);
+            } else if (fileToDelete) {
+              await deleteFile(fileToDelete.id);
+              setFileToDelete(null);
+            }
+          } catch (error) {
+            console.error('Error deleting:', error);
+          }
+        }}
+        onCancel={() => {
+          setFileToDelete(null);
+          setIsConfirmingClearAll(false);
+        }}
+      />
     </div>
   );
 }

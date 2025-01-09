@@ -3,7 +3,12 @@ import { supabase } from './supabase';
 interface UploadResult {
   fileId: string;
   publicUrl: string;
-  segments?: any[];
+  segments?: Array<{
+    text: string;
+    startTime: number;
+    endTime: number;
+    speaker?: string;
+  }>;
   key_events?: string[];
   error?: string;
 }
@@ -24,7 +29,7 @@ export async function uploadAudioFile(
 
     // Upload file to Supabase Storage
     const fileName = `${Date.now()}-${file.name}`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('audio-files')
       .upload(fileName, file);
 
@@ -137,14 +142,6 @@ export async function uploadAudioFile(
 
   } catch (error) {
     console.error('Upload error:', error);
-    
-    // If we have a file ID, update its status to failed in the database
-    if (dbData?.id) {
-      await supabase
-        .from('audio_files')
-        .update({ status: 'failed' })
-        .eq('id', dbData.id);
-    }
     
     onProgress?.('failed');
     return {

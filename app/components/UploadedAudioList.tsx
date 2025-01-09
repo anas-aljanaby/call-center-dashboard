@@ -7,6 +7,7 @@ import { AudioFile } from '../types/audio';
 
 interface UploadedAudioListProps {
   onSelect: (file: AudioFile) => void;
+  selectedFileId?: string | null;
 }
 
 const AudioItemSkeleton = () => (
@@ -25,9 +26,8 @@ const AudioItemSkeleton = () => (
   </div>
 );
 
-const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
+const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, selectedFileId }) => {
   const { audioFiles, isLoading, error, refreshFiles, deleteFile, deletingFiles } = useAudioFiles();
-  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +60,6 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
   }, []);
 
   const handleFileSelect = (file: AudioFile) => {
-    setSelectedFileId(file.id);
     onSelect(file);
   };
 
@@ -93,7 +92,7 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
     <div className="flex flex-col h-96">
       <h3 className="text-lg font-semibold text-gray-700 mb-2">Uploaded Audio Files</h3>
       <div className="flex-1 overflow-y-auto border border-gray-200 rounded-lg bg-white">
-        <div className="p-2 space-y-2">
+        <div className="space-y-2 p-2">
           {isLoading ? (
             <>
               <AudioItemSkeleton />

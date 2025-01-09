@@ -132,6 +132,49 @@ export function useAudioFiles() {
     }
   };
 
+  const deleteAllFiles = async () => {
+    try {
+      // Get all file IDs and URLs
+      const fileIds = audioFiles.map(file => file.id);
+      
+      // Get all file paths from URLs
+      const filePaths = audioFiles
+        .map(file => {
+          try {
+            const url = new URL(file.file_url);
+            return url.pathname.split('/').pop();
+          } catch (e) {
+            console.error('Error extracting file path:', e);
+            return null;
+          }
+        })
+        .filter((path): path is string => path !== null);
+
+      if (filePaths.length > 0) {
+        // Delete all files from storage
+        const { error: storageError } = await supabase.storage
+          .from('audio-files')
+          .remove(filePaths);
+
+        if (storageError) throw storageError;
+      }
+
+      // Delete all records from the database
+      const { error: dbError } = await supabase
+        .from('audio_files')
+        .delete()
+        .in('id', fileIds);
+
+      if (dbError) throw dbError;
+
+      // Update local state
+      setAudioFiles([]);
+    } catch (error) {
+      console.error('Error deleting all files:', error);
+      throw error;
+    }
+  };
+
   // Initial load
   useEffect(() => {
     refreshFiles();
@@ -144,6 +187,7 @@ export function useAudioFiles() {
     uploadFiles,
     refreshFiles,
     deleteFile,
+    deleteAllFiles,
     deletingFiles
   };
 } 

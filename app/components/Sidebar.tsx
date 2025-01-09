@@ -1,25 +1,18 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { BiChevronLeft, BiChevronRight, BiUpload } from 'react-icons/bi';
+import { useState } from 'react';
+import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { BrainCircuit } from 'lucide-react';
 import UploadedAudioList from './UploadedAudioList';
-import { useAudioFiles } from '../hooks/useAudioFiles';
 import { AudioFile } from '../types/audio';
 
-interface Segment {
-  text: string;
-  startTime: number;
-  endTime: number;
-  speaker: string;
-  channel: number;
-}
 
 interface SidebarProps {
   onFileSelect: (file: AudioFile) => void;
+  selectedFileId?: string | null;
 }
 
-export default function Sidebar({ onFileSelect }: SidebarProps) {
+export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
@@ -46,6 +39,7 @@ export default function Sidebar({ onFileSelect }: SidebarProps) {
                 onSelect={(file) => {
                   onFileSelect(file);
                 }}
+                selectedFileId={selectedFileId}
               />
             </div>
           </div>

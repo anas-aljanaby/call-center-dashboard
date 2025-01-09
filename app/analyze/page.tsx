@@ -1,11 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
+import { AudioFile } from '../types/audio';
 import ConversationTimeline from '../components/ConversationTimeline';
 import CallDetails from '../components/CallDetails';
 import ConversationSegments from '../components/ConversationSegments';
 import AudioPlayer from '../components/AudioPlayer';
 import Sidebar from '../components/Sidebar';
-import { AudioFile } from '../types/audio';
+import { useAudioFiles } from '../hooks/useAudioFiles';
 
 interface Segment {
   text: string;
@@ -24,6 +25,16 @@ export default function Home() {
   const [keyEvents, setKeyEvents] = useState<string[]>([]);
   const [summary, setSummary] = useState<string>('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { audioFiles } = useAudioFiles();
+
+  useEffect(() => {
+    if (!selectedFile && audioFiles.length > 0) {
+      const firstReadyFile = audioFiles.find(file => file.status === 'ready');
+      if (firstReadyFile) {
+        handleFileSelect(firstReadyFile);
+      }
+    }
+  }, [audioFiles, selectedFile]);
 
   useEffect(() => {
     if (selectedFile) {
@@ -106,6 +117,7 @@ export default function Home() {
     <main className="flex h-screen overflow-hidden">
       <Sidebar 
         onFileSelect={handleFileSelect}
+        selectedFileId={selectedFile?.id}
       />
       <div className="flex-1 overflow-hidden">
         <div className="h-full flex flex-col bg-white">
