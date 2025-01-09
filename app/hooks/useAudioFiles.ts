@@ -26,12 +26,37 @@ export function useAudioFiles() {
 
   const deleteFile = async (fileId: string) => {
     try {
-      const { error } = await supabase
+      // First get the file details to get the filename
+      const { data: fileData, error: fetchError } = await supabase
+        .from('audio_files')
+        .select('file_url')
+        .eq('id', fileId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Extract filename from the URL
+      const fileUrl = new URL(fileData.file_url);
+      const filePath = fileUrl.pathname.split('/').pop();
+
+      if (!filePath) {
+        throw new Error('Could not extract filename from URL');
+      }
+
+      // Delete the file from storage
+      const { error: storageError } = await supabase.storage
+        .from('audio-files')
+        .remove([filePath]);
+
+      if (storageError) throw storageError;
+
+      // Delete the record from the database
+      const { error: dbError } = await supabase
         .from('audio_files')
         .delete()
         .eq('id', fileId);
 
-      if (error) throw error;
+      if (dbError) throw dbError;
 
       // Update local state
       setAudioFiles(prev => prev.filter(file => file.id !== fileId));
