@@ -93,48 +93,51 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect }) => {
                       : 'border-gray-200 hover:bg-gray-50'}`}
                   onClick={() => handleFileSelect(file)}
                 >
-                  <div className="flex items-start gap-2">
-                    <BiFile className="text-gray-400 mt-1" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {file.file_name}
-                      </p>
+                  <div className="flex flex-col h-full ">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-2 min-w-0 flex-1 pr-4">
+                        <BiFile className="text-gray-400 mt-0.5 flex-shrink-0" />
+                        <p className="text-sm font-medium text-gray-900 truncate max-w-[300px]">
+                          {file.file_name}
+                        </p>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuOpenId(menuOpenId === file.id ? null : file.id);
+                        }}
+                        className="p-1 rounded-full hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity -mt-1 -mr-1 flex-shrink-0"
+                      >
+                        <BiDotsVertical className="text-gray-500" />
+                      </button>
+                    </div>
+                    
+                    <div className="flex justify-between items-end mt-auto pt-2">
                       <p className="text-xs text-gray-500">
                         {formatDate(file.uploaded_at)}
                       </p>
+                      {file.status !== 'ready' && (
+                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusStyle(file.status)}`}>
+                          {file.status.charAt(0).toUpperCase() + file.status.slice(1)}
+                        </span>
+                      )}
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setMenuOpenId(menuOpenId === file.id ? null : file.id);
-                      }}
-                      className="p-1 rounded-full hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity -mt-1"
-                    >
-                      <BiDotsVertical className="text-gray-500" />
-                    </button>
-                    {menuOpenId === file.id && (
-                      <div 
-                        ref={menuRef}
-                        className="absolute top-0 right-0 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-10 mt-8"
-                      >
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteClick(file.id);
-                          }}
-                          className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                        >
-                          <BiTrash />
-                          Delete
-                        </button>
-                      </div>
-                    )}
                   </div>
-                  {file.status !== 'ready' && (
-                    <div className="absolute bottom-1.5 right-2">
-                      <span className={`px-1 py-0.5 text-xs rounded-full ${getStatusStyle(file.status)}`}>
-                        {file.status.charAt(0).toUpperCase() + file.status.slice(1)}
-                      </span>
+                  {menuOpenId === file.id && (
+                    <div 
+                      ref={menuRef}
+                      className="absolute top-0 right-0 w-32 bg-white rounded-md shadow-lg border border-gray-200 z-10 mt-8"
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(file.id);
+                        }}
+                        className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                      >
+                        <BiTrash />
+                        Delete
+                      </button>
                     </div>
                   )}
                 </div>

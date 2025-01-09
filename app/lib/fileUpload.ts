@@ -54,6 +54,12 @@ export async function uploadAudioFile(
 
     // Start transcription
     onProgress?.('transcribing');
+    // Update status in database
+    await supabase
+      .from('audio_files')
+      .update({ status: 'transcribing' })
+      .eq('id', dbData.id);
+
     const response = await fetch('http://localhost:8000/api/transcribe', {
       method: 'POST',
       body: (() => {
@@ -78,6 +84,8 @@ export async function uploadAudioFile(
       })
       .eq('id', dbData.id);
 
+    onProgress?.('summarizing');
+
     // Get key events
     const eventsResponse = await fetch('http://localhost:8000/api/analyze-events', {
       method: 'POST',
@@ -94,7 +102,6 @@ export async function uploadAudioFile(
     const eventsResult = await eventsResponse.json();
 
     // Start summarization
-    onProgress?.('summarizing');
     const summaryResponse = await fetch('http://localhost:8000/api/summarize-conversation', {
       method: 'POST',
       headers: {
@@ -109,7 +116,7 @@ export async function uploadAudioFile(
 
     const summaryResult = await summaryResponse.json();
 
-    // Update summary and key events in database
+    // Update summary and key events in database with final ready status
     await supabase
       .from('audio_files')
       .update({
@@ -130,6 +137,14 @@ export async function uploadAudioFile(
 
   } catch (error) {
     console.error('Upload error:', error);
+    
+    // If we have a file ID, update its status to failed in the database
+    if (dbData?.id) {
+      await supabase
+        .from('audio_files')
+        .update({ status: 'failed' })
+        .eq('id', dbData.id);
+    }
     
     onProgress?.('failed');
     return {
