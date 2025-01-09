@@ -1,6 +1,7 @@
 import { writeFile, mkdir } from 'fs/promises';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
+import { AudioFile } from '@/app/types/audio';
 
 const uploadsDirectory = path.join(process.cwd(), 'public', 'uploads');
 
@@ -29,14 +30,13 @@ export async function POST(request: NextRequest) {
     await writeFile(filePath, buffer);
 
     // Save metadata to JSON file
-    const metadata = {
+    const metadata: AudioFile = {
       id: Date.now().toString(),
-      originalName: file.name,
-      filename: uniqueFilename,
-      size: file.size,
-      uploadDate: new Date().toISOString(),
-      status: 'ready' as const,
-      path: `/uploads/${uniqueFilename}`
+      file_name: file.name,
+      file_url: `/uploads/${uniqueFilename}`,
+      uploaded_at: new Date().toISOString(),
+      status: 'ready',
+      size: file.size
     };
 
     // Add to database

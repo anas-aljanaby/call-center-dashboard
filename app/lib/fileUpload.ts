@@ -65,7 +65,7 @@ export async function uploadAudioFile(
       .update({ status: 'transcribing' })
       .eq('id', dbData.id);
 
-    const response = await fetch('http://localhost:8000/api/transcribe-dummy', {
+    const response = await fetch('http://localhost:8000/api/transcribe', {
       method: 'POST',
       body: (() => {
         const formData = new FormData();

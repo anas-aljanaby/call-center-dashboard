@@ -1,13 +1,6 @@
 import React from 'react';
 import { BiPlay } from 'react-icons/bi';
-
-interface Segment {
-  startTime: number;
-  endTime: number;
-  text: string;
-  speaker: string;
-  channel: number;
-}
+import { Segment } from '../types/audio';
 
 interface ConversationSegmentsProps {
   segments: Segment[];

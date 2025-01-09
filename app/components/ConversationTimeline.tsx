@@ -1,12 +1,5 @@
 import React from 'react';
-
-interface Segment {
-  startTime: number;
-  endTime: number;
-  text: string;
-  speaker: string;
-  channel: number;
-}
+import { Segment } from '../types/audio';
 
 interface ConversationTimelineProps {
   segments: Segment[];

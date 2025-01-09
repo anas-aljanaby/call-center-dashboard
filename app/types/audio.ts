@@ -6,7 +6,16 @@ export interface AudioFile {
   uploaded_at: string;
   key_events?: string[];
   summary?: string;
-  transcription?: any;
+  transcription?: Segment[];
   size?: string | number;
   status: 'processing' | 'transcribing' | 'summarizing' | 'ready' | 'failed';
+}
+
+export interface Segment {
+  startTime: number;
+  endTime: number;
+  text: string;
+  speaker?: string;
+  channel?: number;
+  sentiment?: string;
 } 

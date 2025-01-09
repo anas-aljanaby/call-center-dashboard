@@ -1,20 +1,12 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { AudioFile } from '../types/audio';
+import { AudioFile, Segment } from '../types/audio';
 import ConversationTimeline from '../components/ConversationTimeline';
 import CallDetails from '../components/CallDetails';
 import ConversationSegments from '../components/ConversationSegments';
 import AudioPlayer from '../components/AudioPlayer';
 import Sidebar from '../components/Sidebar';
 import { useAudioFiles } from '../hooks/useAudioFiles';
-
-interface Segment {
-  text: string;
-  startTime: number;
-  endTime: number;
-  speaker: string;
-  channel: number;
-}
 
 export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);

@@ -4,18 +4,19 @@ import "./globals.css";
 import Navbar from "./components/Navbar";
 import AuthGuard from "./components/AuthGuard";
 import { usePathname } from 'next/navigation';
+import type { ReactElement } from "react";
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}): ReactElement {
   const pathname = usePathname();
   const showNavbar = pathname !== '/';
 
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="h-full">
+      <body className="h-full">
         <AuthGuard>
           <div className="flex flex-col h-screen">
             {showNavbar && <Navbar />}

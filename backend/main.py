@@ -232,7 +232,7 @@ class TranscriptSegment(BaseModel):
     text: str
     speaker: Optional[str] = None
     channel: Optional[int] = None
-    checklist_item: Optional[str] = None
+    sentiment: str = "neutral"  # Optional with default value
 
 class ChecklistRequest(BaseModel):
     segments: List[TranscriptSegment]
@@ -392,14 +392,8 @@ async def analyze_events(request: ConversationRequest):
             detail=f"Error analyzing conversation events: {str(e)}"
         )
 
-class TranscriptionSegment(BaseModel):
-    startTime: float
-    endTime: float
-    text: str
-    speaker: str
-
 class SummaryRequest(BaseModel):
-    segments: List[TranscriptionSegment]
+    segments: List[TranscriptSegment]
 
 @app.post("/api/summarize-conversation")
 async def summarize_conversation(request: SummaryRequest):

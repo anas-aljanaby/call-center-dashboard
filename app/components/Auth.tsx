@@ -23,7 +23,7 @@ export default function AuthComponent() {
       // Redirect to analyze page after successful login
       router.push('/analyze');
     } catch (error) {
-      setError(error.message);
+      setError(error instanceof Error ? error.message : 'An error occurred');
     }
   };
 

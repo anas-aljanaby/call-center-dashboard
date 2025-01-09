@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 
+const publicRoutes = ['/'];
+
 export default function AuthGuard({
   children,
 }: {
@@ -12,7 +14,6 @@ export default function AuthGuard({
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
-  const publicRoutes = ['/'];
 
   useEffect(() => {
     const checkAuth = async () => {

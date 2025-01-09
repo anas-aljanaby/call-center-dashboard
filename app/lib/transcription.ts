@@ -1,7 +1,8 @@
 import { supabase } from './supabase';
+import { Segment } from '../types/audio';
 
 interface TranscriptionResult {
-  segments: any[];
+  segments: Segment[];
   error?: string;
 }
 
@@ -66,7 +67,7 @@ export async function transcribeAudioFile(
 } 
 
 export async function summarizeTranscription(
-    segments: any[],
+    segments: Segment[],
     fileId: string,
     onProgress?: (status: 'pending' | 'completed' | 'failed') => void
   ) {
