@@ -47,4 +47,4 @@ public/uploads/*
 uploads/*
 data/*
 public/uploads-temp/*
-app/temp/*
+backend/
