@@ -93,7 +93,7 @@ export async function uploadAudioFile(
     onProgress?.('summarizing');
 
     // Get key events
-    const eventsResponse = await fetch('http://localhost:8000/api/analyze-events', {
+    const eventsResponse = await fetch(`${API_BASE_URL}/api/analyze-events`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export async function uploadAudioFile(
     const eventsResult = await eventsResponse.json();
 
     // Start summarization
-    const summaryResponse = await fetch('http://localhost:8000/api/summarize-conversation', {
+    const summaryResponse = await fetch(`${API_BASE_URL}/api/summarize-conversation`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
