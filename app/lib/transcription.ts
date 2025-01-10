@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { Segment } from '../types/audio';
+import { API_BASE_URL } from '../config/api';
 
 interface TranscriptionResult {
   segments: Segment[];
@@ -19,7 +20,7 @@ export async function transcribeAudioFile(
     formData.append('file', file, 'audio.mp3');
 
     // Start transcription
-    const response = await fetch('http://localhost:8000/api/transcribe', {
+    const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
       method: 'POST',
       body: formData,
     });

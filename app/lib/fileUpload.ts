@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { API_BASE_URL } from '../config/api';
 
 interface UploadResult {
   fileId: string;
@@ -65,7 +66,7 @@ export async function uploadAudioFile(
       .update({ status: 'transcribing' })
       .eq('id', dbData.id);
 
-    const response = await fetch('http://localhost:8000/api/transcribe', {
+    const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
       method: 'POST',
       body: (() => {
         const formData = new FormData();
