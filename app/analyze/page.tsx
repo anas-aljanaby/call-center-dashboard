@@ -32,12 +32,12 @@ export default function Home() {
     if (selectedFile) {
       // Set audio URL
       audioRef.current = new Audio(selectedFile.file_url);
-      
+
       // Set transcription data if available
       if (selectedFile.transcription) {
         try {
-          const parsedTranscription = typeof selectedFile.transcription === 'string' 
-            ? JSON.parse(selectedFile.transcription) 
+          const parsedTranscription = typeof selectedFile.transcription === 'string'
+            ? JSON.parse(selectedFile.transcription)
             : selectedFile.transcription;
           setSegments(parsedTranscription);
         } catch (error) {
@@ -45,12 +45,12 @@ export default function Home() {
           setSegments([]);
         }
       }
-      
+
       // Set key events if available
       if (selectedFile.key_events) {
         setKeyEvents(selectedFile.key_events);
       }
-      
+
       // Set summary if available
       if (selectedFile.summary) {
         setSummary(selectedFile.summary);
@@ -107,11 +107,11 @@ export default function Home() {
 
   return (
     <main className="flex h-screen overflow-hidden">
-      <Sidebar 
+      <Sidebar
         onFileSelect={handleFileSelect}
         selectedFileId={selectedFile?.id}
       />
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden flex flex-col">
         <div className="h-full flex flex-col bg-white">
           <div className="overflow-x-auto">
             <div className="min-w-full">
@@ -128,8 +128,10 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-1 overflow-hidden mt-4 border-t border-gray-200">
-            <CallDetails keyEvents={keyEvents} summary={summary} />
-            <div className="flex-1 pl-3 border-l border-gray-200 ml-2">
+            <div className="h-[calc(100vh-300px)]">
+              <CallDetails keyEvents={keyEvents} summary={summary} />
+            </div>
+            <div className="flex-1 pl-3 border-l border-gray-200 ml-2 h-[calc(100vh-300px)]">
               <ConversationSegments segments={segments} />
             </div>
           </div>

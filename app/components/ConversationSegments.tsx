@@ -18,7 +18,7 @@ const ConversationSegments: React.FC<ConversationSegmentsProps> = ({ segments = 
 
   return (
     <div className="w-full h-full flex flex-col">
-      <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent h-full">
         {safeSegments.map((segment, index) => (
           <div key={index} className="mb-4">
             <div className="flex items-center justify-between mb-1">

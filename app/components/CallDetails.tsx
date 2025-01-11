@@ -39,7 +39,7 @@ export default function CallDetails({ keyEvents = [], summary = '' }: CallDetail
   const [activeTab, setActiveTab] = useState<Tab>('insights');
 
   return (
-    <div className="flex w-80 min-w-[320px] border-r border-gray-200">
+    <div className="flex w-80 min-w-[320px] border-r border-gray-200 h-full">
       {/* Sidebar */}
       <div className="w-12 bg-gray-50 border-r border-gray-200">
         <div className="flex flex-col items-center py-4 space-y-6">
@@ -65,55 +65,56 @@ export default function CallDetails({ keyEvents = [], summary = '' }: CallDetail
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-6 overflow-y-auto">
-        <div className="w-full max-w-xs">
-          {activeTab === 'insights' && (
-            <div className="space-y-4">
-              <h2 className="text-gray-600 text-xl font-semibold mb-6">Key Events</h2>
-              {keyEvents.length > 0 ? (
-                <ul className="space-y-3">
-                  {keyEvents.map((event, index) => (
-                    <li key={index} className="flex items-start space-x-2 text-sm text-gray-700">
-                      <span className="min-w-[24px] h-6 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full">
-                        {index + 1}
-                      </span>
-                      <span className="flex-1">{event}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm text-gray-400">Select a call to view key events and important moments from the conversation.</p>
-              )}
-            </div>
-          )}
-          {activeTab === 'summary' && (
-            <div className="space-y-4">
-              <h2 className="text-gray-600 text-xl font-semibold mb-6">AI Summary</h2>
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {summary || <span className="text-gray-400">Select a call to view an AI-generated summary of the conversation.</span>}
-              </p>
-            </div>
-          )}
-          {activeTab === 'info' && (
-            <div className="space-y-4">
-              <h2 className="text-gray-600 text-xl font-semibold mb-6">Call Info</h2>
-              {Object.keys(dummyCallInfo).length > 0 ? (
-                <div className="space-y-4">
-                  {Object.entries(dummyCallInfo).map(([key, value]) => (
-                    <div key={key} className="flex justify-between items-center border-b border-gray-200 pb-2">
-                      <div className="text-sm text-gray-600">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-6">
+          <div className="w-full max-w-xs">
+            {activeTab === 'insights' && (
+              <div className="space-y-4">
+                <h2 className="text-gray-600 text-xl font-semibold mb-6">Key Events</h2>
+                {keyEvents.length > 0 ? (
+                  <ul className="space-y-3">
+                    {keyEvents.map((event, index) => (
+                      <li key={index} className="flex items-start space-x-2 text-sm text-gray-700">
+                        <span className="min-w-[24px] h-6 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full">
+                          {index + 1}
+                        </span>
+                        <span className="flex-1">{event}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-400">Select a call to view key events and important moments from the conversation.</p>
+                )}
+              </div>
+            )}
+            {activeTab === 'summary' && (
+              <div className="space-y-4">
+                <h2 className="text-gray-600 text-xl font-semibold mb-6">AI Summary</h2>
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {summary || <span className="text-gray-400">Select a call to view an AI-generated summary of the conversation.</span>}
+                </p>
+              </div>
+            )}
+            {activeTab === 'info' && (
+              <div className="space-y-4">
+                <h2 className="text-gray-600 text-xl font-semibold mb-6">Call Info</h2>
+                {Object.keys(dummyCallInfo).length > 0 ? (
+                  <div className="space-y-4">
+                    {Object.entries(dummyCallInfo).map(([key, value]) => (
+                      <div key={key} className="flex justify-between items-center border-b border-gray-200 pb-2">
+                        <div className="text-sm text-gray-600">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </div>
+                        <div className="text-gray-900">{value}</div>
                       </div>
-                      <div className="text-gray-900">{value}</div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-gray-400">Select a call to view detailed information about the conversation.</p>
-              )}
-            </div>
-          )}
-
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">Select a call to view detailed information about the conversation.</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

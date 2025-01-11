@@ -32,7 +32,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments =[
             <span className="text-sm font-medium" style={{ color: 'green' }}>Speaker 0</span>
           </div>
         </div>
-        <div className="relative h-full ml-24" style={{ width: `${Math.max(totalWidth, 800)}px` }}>
+        <div className="relative h-full ml-24" >
           <div className="absolute left-0 right-0 top-1/2 border-t border-gray-300"></div>
           <div className="absolute left-0 right-0 top-1/2 border-t border-gray-300" style={{ top: 'calc(50% + 10px)' }}></div>
           {safeSegments.map((segment, index) => (
