@@ -3,12 +3,10 @@ import { Segment } from '../types/audio';
 
 interface ConversationTimelineProps {
   segments: Segment[];
-  duration: number;
 }
 
-const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments =[], duration }) => {
+const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments =[] }) => {
   const PIXELS_PER_SECOND = 20;
-  const totalWidth = duration * PIXELS_PER_SECOND;
 
   // Ensure segments is an array
   const safeSegments = Array.isArray(segments) ? segments : [];
@@ -32,7 +30,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({ segments =[
             <span className="text-sm font-medium" style={{ color: 'green' }}>Speaker 0</span>
           </div>
         </div>
-        <div className="relative h-full ml-24" >
+        <div className="relative h-full ml-24">
           <div className="absolute left-0 right-0 top-1/2 border-t border-gray-300"></div>
           <div className="absolute left-0 right-0 top-1/2 border-t border-gray-300" style={{ top: 'calc(50% + 10px)' }}></div>
           {safeSegments.map((segment, index) => (
