@@ -3,8 +3,9 @@ import { AudioFile } from '../types/audio';
 import { uploadAudioFile } from '../lib/fileUpload';
 import { fetchUserAudioFiles } from '../lib/audioFiles';
 import { supabase } from '../lib/supabase';
-import { API_BASE_URL } from '../config/api';
 import { useSettings } from '../contexts/SettingsContext';
+import { ProcessingSettings } from '../contexts/SettingsContext';
+import { transcribeWithSettings, analyzeEventsWithSettings, summarizeWithSettings } from '../lib/processingService';
 
 export function useAudioFiles() {
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
@@ -182,7 +183,11 @@ export function useAudioFiles() {
     }
   };
 
-  const reprocessFile = async (file: AudioFile) => {
+  const reprocessFile = async (file: AudioFile, settings: ProcessingSettings) => {
+    if (!settings) {
+      throw new Error('Processing settings are required');
+    }
+
     try {
       // Update status to processing
       const { error: updateError } = await supabase
@@ -197,12 +202,20 @@ export function useAudioFiles() {
         f.id === file.id ? { ...f, status: 'processing' } : f
       ));
 
-      // Get the file from storage
-      const { data: fileData } = await supabase.storage
-        .from('audio-files')
-        .download(file.file_url.split('/').pop() || '');
+      // Extract filename from the URL
+      const fileUrl = new URL(file.file_url);
+      const filePath = fileUrl.pathname.split('/').pop();
 
-      if (!fileData) {
+      if (!filePath) {
+        throw new Error('Could not extract filename from URL');
+      }
+
+      // Get the file from storage
+      const { data: fileData, error: downloadError } = await supabase.storage
+        .from('audio-files')
+        .download(filePath);
+
+      if (!fileData || downloadError) {
         throw new Error('Could not download file');
       }
 
@@ -211,100 +224,71 @@ export function useAudioFiles() {
         type: 'audio/mpeg'
       });
 
-      // Update status to transcribing
-      await supabase
-        .from('audio_files')
-        .update({ status: 'transcribing' })
-        .eq('id', file.id);
-
-      // Update UI to show transcribing
-      setAudioFiles(prev => prev.map(f => 
-        f.id === file.id ? { ...f, status: 'transcribing' } : f
-      ));
-
-      // Start transcription
-      const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
-        method: 'POST',
-        body: (() => {
-          const formData = new FormData();
-          formData.append('file', audioFile, 'audio.mp3');
-          return formData;
-        })()
-      });
-
-      if (!response.ok) {
-        throw new Error(`Transcription failed: ${response.statusText}`);
+      interface ProcessingUpdates {
+        transcription?: Array<{
+          text: string;
+          startTime: number;
+          endTime: number;
+          speaker?: string;
+        }>;
+        key_events?: string[];
+        summary?: string;
       }
 
-      const transcriptionResult = await response.json();
+      const updates: ProcessingUpdates = {};
 
-      // Update status to summarizing
-      await supabase
-        .from('audio_files')
-        .update({
-          transcription: transcriptionResult.segments,
-          status: 'summarizing'
-        })
-        .eq('id', file.id);
-
-      // Update UI to show summarizing
-      setAudioFiles(prev => prev.map(f => 
-        f.id === file.id ? { 
-          ...f, 
-          status: 'summarizing',
-          transcription: transcriptionResult.segments 
-        } : f
-      ));
-
-      // Get key events
-      const eventsResponse = await fetch(`${API_BASE_URL}/api/analyze-events`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ segments: transcriptionResult.segments }),
-      });
-
-      if (!eventsResponse.ok) {
-        throw new Error(`Events analysis failed: ${eventsResponse.statusText}`);
+      // Only process transcription if enabled and using real model
+      if (settings.transcriptionEnabled && settings.transcriptionModel === 'real') {
+        const transcriptionResult = await transcribeWithSettings(audioFile, settings);
+        if (transcriptionResult.segments) {
+          updates.transcription = transcriptionResult.segments;
+        }
       }
 
-      const eventsResult = await eventsResponse.json();
-
-      // Get summary
-      const summaryResponse = await fetch(`${API_BASE_URL}/api/summarize-conversation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ segments: transcriptionResult.segments }),
-      });
-
-      if (!summaryResponse.ok) {
-        throw new Error(`Summarization failed: ${summaryResponse.statusText}`);
+      // Only process key events if enabled
+      if (settings.keyEventsEnabled && updates.transcription) {
+        const eventsResult = await analyzeEventsWithSettings(
+          updates.transcription || file.transcription,
+          settings
+        );
+        if (eventsResult.key_events) {
+          updates.key_events = eventsResult.key_events;
+        }
       }
 
-      const summaryResult = await summaryResponse.json();
+      // Only process summary if enabled
+      if (settings.summaryEnabled && updates.transcription) {
+        const summaryResult = await summarizeWithSettings(
+          updates.transcription || file.transcription,
+          settings
+        );
+        if (summaryResult.summary) {
+          updates.summary = summaryResult.summary;
+        }
+      }
 
-      // Update final data in database
-      await supabase
+      // If no updates were made, skip the database update
+      if (Object.keys(updates).length === 0) {
+        throw new Error('No processing was performed due to settings configuration');
+      }
+
+      // Update the record with new data
+      const { error: finalUpdateError } = await supabase
         .from('audio_files')
         .update({
-          transcription: transcriptionResult.segments,
-          key_events: eventsResult.key_events,
-          summary: summaryResult.summary,
+          ...updates,
           status: 'ready'
         })
         .eq('id', file.id);
 
-      // Update UI with final data
+      if (finalUpdateError) throw finalUpdateError;
+
+      // Update the UI with processed data
       setAudioFiles(prev => prev.map(f => 
         f.id === file.id ? {
           ...f,
-          status: 'ready',
-          transcription: transcriptionResult.segments,
-          key_events: eventsResult.key_events,
-          summary: summaryResult.summary
+          ...updates,
+          status: 'ready'
         } : f
       ));
 

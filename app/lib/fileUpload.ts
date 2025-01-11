@@ -1,5 +1,4 @@
 import { supabase } from './supabase';
-import { API_BASE_URL } from '../config/api';
 import { ProcessingSettings } from '../contexts/SettingsContext';
 import { transcribeWithSettings, analyzeEventsWithSettings, summarizeWithSettings } from './processingService';
 

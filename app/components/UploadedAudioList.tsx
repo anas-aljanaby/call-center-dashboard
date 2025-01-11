@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { BiFile, BiDotsVertical, BiTrash, BiRefresh } from 'react-icons/bi';
 import { useAudioFiles } from '../hooks/useAudioFiles';
 import { AudioFile } from '../types/audio';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface UploadedAudioListProps {
   onSelect: (file: AudioFile) => void;
@@ -28,6 +29,7 @@ const AudioItemSkeleton = () => (
 
 const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, selectedFileId }) => {
   const { audioFiles, isLoading, error, refreshFiles, deleteFile, deletingFiles, reprocessFile } = useAudioFiles();
+  const { settings } = useSettings();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -76,7 +78,7 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, selecte
   const handleReprocessClick = async (file: AudioFile) => {
     try {
       setMenuOpenId(null);
-      await reprocessFile(file);
+      await reprocessFile(file, settings);
     } catch (error) {
       console.error('Error reprocessing file:', error);
     }
