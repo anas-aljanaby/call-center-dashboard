@@ -3,12 +3,16 @@ import { AudioFile } from '../types/audio';
 import { uploadAudioFile } from '../lib/fileUpload';
 import { fetchUserAudioFiles } from '../lib/audioFiles';
 import { supabase } from '../lib/supabase';
+import { useSettings } from '../contexts/SettingsContext';
+import { ProcessingSettings } from '../contexts/SettingsContext';
+import { transcribeWithSettings, analyzeEventsWithSettings, summarizeWithSettings } from '../lib/processingService';
 
 export function useAudioFiles() {
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set());
+  const { settings } = useSettings();
 
   const refreshFiles = useCallback(async () => {
     setIsLoading(true);
@@ -103,13 +107,17 @@ export function useAudioFiles() {
     ]);
 
     for (const file of newFiles) {
-      const result = await uploadAudioFile(file, (status) => {
-        setAudioFiles(prev => prev.map(audioFile => 
-          audioFile.file_name === file.name
-            ? { ...audioFile, status }
-            : audioFile
-        ));
-      });
+      const result = await uploadAudioFile(
+        file,
+        settings,
+        (status) => {
+          setAudioFiles(prev => prev.map(audioFile => 
+            audioFile.file_name === file.name
+              ? { ...audioFile, status }
+              : audioFile
+          ));
+        }
+      );
 
       if (!result.error) {
         // Update the file entry with the actual data
@@ -175,6 +183,133 @@ export function useAudioFiles() {
     }
   };
 
+  const reprocessFile = async (file: AudioFile, settings: ProcessingSettings) => {
+    if (!settings) {
+      throw new Error('Processing settings are required');
+    }
+
+    try {
+      // Update status to processing
+      const { error: updateError } = await supabase
+        .from('audio_files')
+        .update({ status: 'processing' })
+        .eq('id', file.id);
+
+      if (updateError) throw updateError;
+
+      // Optimistically update UI
+      setAudioFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, status: 'processing' } : f
+      ));
+
+      // Extract filename from the URL
+      const fileUrl = new URL(file.file_url);
+      const filePath = fileUrl.pathname.split('/').pop();
+
+      if (!filePath) {
+        throw new Error('Could not extract filename from URL');
+      }
+
+      // Get the file from storage
+      const { data: fileData, error: downloadError } = await supabase.storage
+        .from('audio-files')
+        .download(filePath);
+
+      if (!fileData || downloadError) {
+        throw new Error('Could not download file');
+      }
+
+      // Create a File object from the blob
+      const audioFile = new File([fileData], file.file_name, {
+        type: 'audio/mpeg'
+      });
+
+      interface ProcessingUpdates {
+        transcription?: Array<{
+          text: string;
+          startTime: number;
+          endTime: number;
+          speaker?: string;
+        }>;
+        key_events?: string[];
+        summary?: string;
+      }
+
+      const updates: ProcessingUpdates = {};
+
+      // Only process transcription if enabled and using real model
+      if (settings.transcriptionEnabled && settings.transcriptionModel === 'real') {
+        const transcriptionResult = await transcribeWithSettings(audioFile, settings);
+        if (transcriptionResult.segments) {
+          updates.transcription = transcriptionResult.segments;
+        }
+      }
+
+      // Only process key events if enabled
+      if (settings.keyEventsEnabled && updates.transcription) {
+        const eventsResult = await analyzeEventsWithSettings(
+          updates.transcription || file.transcription,
+          settings
+        );
+        if (eventsResult.key_events) {
+          updates.key_events = eventsResult.key_events;
+        }
+      }
+
+      // Only process summary if enabled
+      if (settings.summaryEnabled && updates.transcription) {
+        const summaryResult = await summarizeWithSettings(
+          updates.transcription || file.transcription,
+          settings
+        );
+        if (summaryResult.summary) {
+          updates.summary = summaryResult.summary;
+        }
+      }
+
+      // If no updates were made, skip the database update
+      if (Object.keys(updates).length === 0) {
+        throw new Error('No processing was performed due to settings configuration');
+      }
+
+      // Update the record with new data
+      const { error: finalUpdateError } = await supabase
+        .from('audio_files')
+        .update({
+          ...updates,
+          status: 'ready'
+        })
+        .eq('id', file.id);
+
+      if (finalUpdateError) throw finalUpdateError;
+
+      // Update the UI with processed data
+      setAudioFiles(prev => prev.map(f => 
+        f.id === file.id ? {
+          ...f,
+          ...updates,
+          status: 'ready'
+        } : f
+      ));
+
+    } catch (error) {
+      console.error('Reprocess error:', error);
+      
+      // Update status to failed
+      await supabase
+        .from('audio_files')
+        .update({ status: 'failed' })
+        .eq('id', file.id);
+
+      // Update UI to show failed status
+      setAudioFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, status: 'failed' } : f
+      ));
+
+      throw error;
+    }
+  };
+
   // Initial load
   useEffect(() => {
     refreshFiles();
@@ -188,6 +323,7 @@ export function useAudioFiles() {
     refreshFiles,
     deleteFile,
     deleteAllFiles,
-    deletingFiles
+    deletingFiles,
+    reprocessFile
   };
 } 

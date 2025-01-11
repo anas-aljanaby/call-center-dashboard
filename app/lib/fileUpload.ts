@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
-import { API_BASE_URL } from '../config/api';
+import { ProcessingSettings } from '../contexts/SettingsContext';
+import { transcribeWithSettings, analyzeEventsWithSettings, summarizeWithSettings } from './processingService';
 
 interface UploadResult {
   fileId: string;
@@ -16,6 +17,7 @@ interface UploadResult {
 
 export async function uploadAudioFile(
   file: File,
+  settings: ProcessingSettings,
   onProgress?: (status: 'processing' | 'transcribing' | 'summarizing' | 'ready' | 'failed') => void
 ): Promise<UploadResult> {
   try {
@@ -58,87 +60,60 @@ export async function uploadAudioFile(
 
     if (dbError) throw dbError;
 
-    // Start transcription
-    onProgress?.('transcribing');
-    // Update status in database
-    await supabase
-      .from('audio_files')
-      .update({ status: 'transcribing' })
-      .eq('id', dbData.id);
+    if (settings.transcriptionEnabled) {
+      onProgress?.('transcribing');
+      const transcriptionResult = await transcribeWithSettings(file, settings);
+      
+      onProgress?.('summarizing');
+      let eventsResult = { key_events: [] };
+      let summaryResult = { summary: '' };
+      
+      if (settings.keyEventsEnabled) {
+        eventsResult = await analyzeEventsWithSettings(
+          transcriptionResult.segments,
+          settings
+        );
+      }
+      
+      if (settings.summaryEnabled) {
+        summaryResult = await summarizeWithSettings(
+          transcriptionResult.segments,
+          settings
+        );
+      }
 
-    const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
-      method: 'POST',
-      body: (() => {
-        const formData = new FormData();
-        formData.append('file', file, 'audio.mp3');
-        return formData;
-      })()
-    });
+      // Update database with all results
+      await supabase
+        .from('audio_files')
+        .update({
+          transcription: transcriptionResult.segments,
+          summary: summaryResult.summary,
+          key_events: eventsResult.key_events,
+          status: 'ready'
+        })
+        .eq('id', dbData.id);
 
-    if (!response.ok) {
-      throw new Error(`Transcription failed: ${response.statusText}`);
+      onProgress?.('ready');
+
+      return {
+        fileId: dbData.id,
+        publicUrl,
+        segments: transcriptionResult.segments,
+        key_events: eventsResult.key_events
+      };
     }
 
-    const transcriptionResult = await response.json();
-
-    // Update transcription in database
+    // If transcription is not enabled, mark as ready
     await supabase
       .from('audio_files')
-      .update({
-        transcription: transcriptionResult.segments,
-        status: 'summarizing'
-      })
-      .eq('id', dbData.id);
-
-    onProgress?.('summarizing');
-
-    // Get key events
-    const eventsResponse = await fetch(`${API_BASE_URL}/api/analyze-events`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ segments: transcriptionResult.segments }),
-    });
-
-    if (!eventsResponse.ok) {
-      throw new Error(`Events analysis failed: ${eventsResponse.statusText}`);
-    }
-
-    const eventsResult = await eventsResponse.json();
-
-    // Start summarization
-    const summaryResponse = await fetch(`${API_BASE_URL}/api/summarize-conversation`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ segments: transcriptionResult.segments }),
-    });
-
-    if (!summaryResponse.ok) {
-      throw new Error(`Summarization failed: ${summaryResponse.statusText}`);
-    }
-
-    const summaryResult = await summaryResponse.json();
-
-    // Update summary and key events in database with final ready status
-    await supabase
-      .from('audio_files')
-      .update({
-        summary: summaryResult.summary,
-        key_events: eventsResult.key_events,
-        status: 'ready'
-      })
+      .update({ status: 'ready' })
       .eq('id', dbData.id);
 
     onProgress?.('ready');
 
     return {
       fileId: dbData.id,
-      publicUrl,
-      segments: transcriptionResult.segments,
-      key_events: eventsResult.key_events
+      publicUrl
     };
 
   } catch (error) {
