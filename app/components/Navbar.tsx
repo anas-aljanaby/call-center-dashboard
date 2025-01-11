@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { BiSpreadsheet, BiHeadphone, BiBarChartAlt2, BiData, BiCheckSquare, BiTrendingUp, BiSupport, BiPieChartAlt } from 'react-icons/bi';
 import { supabase } from '../lib/supabase';
+import { BrainCircuit } from 'lucide-react';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -23,7 +24,8 @@ const Navbar = () => {
         <div className="flex items-center space-x-8">
           {/* Logo/Brand */}
           <div className="flex items-center space-x-2">
-            <BiHeadphone className="w-6 h-6 text-blue-600" />
+            {/* <BiHeadphone className="w-6 h-6 text-blue-600" /> */}
+            <BrainCircuit size={24} className="w-6 h-6 text-blue-600" />
             <span className="font-semibold text-gray-800">Call Center</span>
           </div>
           

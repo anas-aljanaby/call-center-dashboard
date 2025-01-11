@@ -98,8 +98,8 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, selecte
   };
 
   return (
-    <div className="flex flex-col h-96">
-      <h3 className="text-lg font-semibold text-gray-700 mb-2">Uploaded Audio Files</h3>
+    <div className="flex flex-col h-80">
+      <h3 className="text-lg font-semibold text-gray-700 mb-2">Audio Files</h3>
       <div className="flex-1 overflow-y-auto border border-gray-200 rounded-lg bg-white">
         <div className="space-y-2 p-2">
           {isLoading ? (
