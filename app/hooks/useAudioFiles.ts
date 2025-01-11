@@ -4,12 +4,14 @@ import { uploadAudioFile } from '../lib/fileUpload';
 import { fetchUserAudioFiles } from '../lib/audioFiles';
 import { supabase } from '../lib/supabase';
 import { API_BASE_URL } from '../config/api';
+import { useSettings } from '../contexts/SettingsContext';
 
 export function useAudioFiles() {
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingFiles, setDeletingFiles] = useState<Set<string>>(new Set());
+  const { settings } = useSettings();
 
   const refreshFiles = useCallback(async () => {
     setIsLoading(true);
@@ -104,13 +106,17 @@ export function useAudioFiles() {
     ]);
 
     for (const file of newFiles) {
-      const result = await uploadAudioFile(file, (status) => {
-        setAudioFiles(prev => prev.map(audioFile => 
-          audioFile.file_name === file.name
-            ? { ...audioFile, status }
-            : audioFile
-        ));
-      });
+      const result = await uploadAudioFile(
+        file,
+        settings,
+        (status) => {
+          setAudioFiles(prev => prev.map(audioFile => 
+            audioFile.file_name === file.name
+              ? { ...audioFile, status }
+              : audioFile
+          ));
+        }
+      );
 
       if (!result.error) {
         // Update the file entry with the actual data

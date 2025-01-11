@@ -5,6 +5,7 @@ import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 import { BrainCircuit } from 'lucide-react';
 import UploadedAudioList from './UploadedAudioList';
 import { AudioFile } from '../types/audio';
+import { useSettings } from '../contexts/SettingsContext';
 
 
 interface SidebarProps {
@@ -13,14 +14,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) {
+  const { settings, updateSettings } = useSettings();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [aiModel, setAiModel] = useState('gpt-3.5-turbo');
-  const [transcriptionModel, setTranscriptionModel] = useState('real');
-  const [languageId, setLanguageId] = useState('ar-ir');
-  const [sentimentDetect, setSentimentDetect] = useState(true);
-  const [transcriptionEnabled, setTranscriptionEnabled] = useState(true);
-  const [summaryEnabled, setSummaryEnabled] = useState(true);
-  const [keyEventsEnabled, setKeyEventsEnabled] = useState(true);
 
   return (
     <div className={`relative flex flex-col h-screen transition-all duration-300 bg-white shadow-lg border-r border-gray-200 ${
@@ -69,8 +64,8 @@ export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">AI Model</label>
                     <select
-                      value={aiModel}
-                      onChange={(e) => setAiModel(e.target.value)}
+                      value={settings.aiModel}
+                      onChange={(e) => updateSettings({ aiModel: e.target.value as 'gpt-3.5-turbo' | 'gpt-4o' | 'gpt-4o-mini' })}
                       className="block w-full pl-3 text-gray-700 pr-10 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                     >
                       <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
@@ -82,8 +77,8 @@ export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Transcription Model</label>
                     <select
-                      value={transcriptionModel}
-                      onChange={(e) => setTranscriptionModel(e.target.value)}
+                      value={settings.transcriptionModel}
+                      onChange={(e) => updateSettings({ transcriptionModel: e.target.value as 'real' | 'dummy' })}
                       className="block w-full pl-3 text-gray-700 pr-10 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                     >
                       <option value="real">Real Transcription</option>
@@ -94,8 +89,8 @@ export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
                     <select
-                      value={languageId}
-                      onChange={(e) => setLanguageId(e.target.value)}
+                      value={settings.languageId}
+                      onChange={(e) => updateSettings({ languageId: e.target.value as 'ar-ir' | 'ar' })}
                       className="block w-full text-gray-700 pl-3 pr-10 py-2 text-sm border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                     >
                       <option value="ar-ir">ar-ir</option>
@@ -112,15 +107,15 @@ export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) 
                     </label>
                     <button
                       role="switch"
-                      aria-checked={sentimentDetect}
-                      onClick={() => setSentimentDetect(!sentimentDetect)}
+                      aria-checked={settings.sentimentDetect}
+                      onClick={() => updateSettings({ sentimentDetect: !settings.sentimentDetect })}
                       className={`${
-                        sentimentDetect ? 'bg-blue-600' : 'bg-gray-200'
+                        settings.sentimentDetect ? 'bg-blue-600' : 'bg-gray-200'
                       } relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
                     >
                       <span
                         className={`${
-                          sentimentDetect ? 'translate-x-4' : 'translate-x-0'
+                          settings.sentimentDetect ? 'translate-x-4' : 'translate-x-0'
                         } inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out`}
                       />
                     </button>
@@ -132,15 +127,15 @@ export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) 
                     </label>
                     <button
                       role="switch"
-                      aria-checked={transcriptionEnabled}
-                      onClick={() => setTranscriptionEnabled(!transcriptionEnabled)}
+                      aria-checked={settings.transcriptionEnabled}
+                      onClick={() => updateSettings({ transcriptionEnabled: !settings.transcriptionEnabled })}
                       className={`${
-                        transcriptionEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                        settings.transcriptionEnabled ? 'bg-blue-600' : 'bg-gray-200'
                       } relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
                     >
                       <span
                         className={`${
-                          transcriptionEnabled ? 'translate-x-4' : 'translate-x-0'
+                          settings.transcriptionEnabled ? 'translate-x-4' : 'translate-x-0'
                         } inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out`}
                       />
                     </button>
@@ -152,15 +147,15 @@ export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) 
                     </label>
                     <button
                       role="switch"
-                      aria-checked={summaryEnabled}
-                      onClick={() => setSummaryEnabled(!summaryEnabled)}
+                      aria-checked={settings.summaryEnabled}
+                      onClick={() => updateSettings({ summaryEnabled: !settings.summaryEnabled })}
                       className={`${
-                        summaryEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                        settings.summaryEnabled ? 'bg-blue-600' : 'bg-gray-200'
                       } relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
                     >
                       <span
                         className={`${
-                          summaryEnabled ? 'translate-x-4' : 'translate-x-0'
+                          settings.summaryEnabled ? 'translate-x-4' : 'translate-x-0'
                         } inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out`}
                       />
                     </button>
@@ -172,15 +167,15 @@ export default function Sidebar({ onFileSelect, selectedFileId }: SidebarProps) 
                     </label>
                     <button
                       role="switch"
-                      aria-checked={keyEventsEnabled}
-                      onClick={() => setKeyEventsEnabled(!keyEventsEnabled)}
+                      aria-checked={settings.keyEventsEnabled}
+                      onClick={() => updateSettings({ keyEventsEnabled: !settings.keyEventsEnabled })}
                       className={`${
-                        keyEventsEnabled ? 'bg-blue-600' : 'bg-gray-200'
+                        settings.keyEventsEnabled ? 'bg-blue-600' : 'bg-gray-200'
                       } relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
                     >
                       <span
                         className={`${
-                          keyEventsEnabled ? 'translate-x-4' : 'translate-x-0'
+                          settings.keyEventsEnabled ? 'translate-x-4' : 'translate-x-0'
                         } inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out`}
                       />
                     </button>
