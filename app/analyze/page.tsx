@@ -115,7 +115,7 @@ export default function Home() {
         <div className="h-full flex flex-col bg-white">
           <div className="overflow-x-auto">
             <div className="min-w-full">
-              <ConversationTimeline segments={segments} duration={duration} />
+              <ConversationTimeline segments={segments} />
               <div className="w-full px-4">
                 <AudioPlayer
                   duration={duration}
