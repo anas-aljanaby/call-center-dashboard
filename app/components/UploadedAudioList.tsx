@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { BiFile, BiDotsVertical, BiTrash } from 'react-icons/bi';
+import { BiFile, BiDotsVertical, BiTrash, BiRefresh } from 'react-icons/bi';
 import { useAudioFiles } from '../hooks/useAudioFiles';
 import { AudioFile } from '../types/audio';
 
@@ -27,7 +27,7 @@ const AudioItemSkeleton = () => (
 );
 
 const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, selectedFileId }) => {
-  const { audioFiles, isLoading, error, refreshFiles, deleteFile, deletingFiles } = useAudioFiles();
+  const { audioFiles, isLoading, error, refreshFiles, deleteFile, deletingFiles, reprocessFile } = useAudioFiles();
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -71,6 +71,15 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, selecte
       // Optionally show an error message to the user
     }
     setMenuOpenId(null);
+  };
+
+  const handleReprocessClick = async (file: AudioFile) => {
+    try {
+      setMenuOpenId(null);
+      await reprocessFile(file);
+    } catch (error) {
+      console.error('Error reprocessing file:', error);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -151,9 +160,20 @@ const UploadedAudioList: React.FC<UploadedAudioListProps> = ({ onSelect, selecte
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
+                          handleReprocessClick(file);
+                        }}
+                        className="w-full px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2"
+                        disabled={file.status !== 'ready' && file.status !== 'failed'}
+                      >
+                        <BiRefresh />
+                        Reprocess
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
                           handleDeleteClick(file.id);
                         }}
-                        className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        className="w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-gray-100"
                         disabled={deletingFiles.has(file.id)}
                       >
                         <BiTrash />

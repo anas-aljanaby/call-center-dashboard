@@ -3,6 +3,7 @@ import { AudioFile } from '../types/audio';
 import { uploadAudioFile } from '../lib/fileUpload';
 import { fetchUserAudioFiles } from '../lib/audioFiles';
 import { supabase } from '../lib/supabase';
+import { API_BASE_URL } from '../config/api';
 
 export function useAudioFiles() {
   const [audioFiles, setAudioFiles] = useState<AudioFile[]>([]);
@@ -175,6 +176,150 @@ export function useAudioFiles() {
     }
   };
 
+  const reprocessFile = async (file: AudioFile) => {
+    try {
+      // Update status to processing
+      const { error: updateError } = await supabase
+        .from('audio_files')
+        .update({ status: 'processing' })
+        .eq('id', file.id);
+
+      if (updateError) throw updateError;
+
+      // Optimistically update UI
+      setAudioFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, status: 'processing' } : f
+      ));
+
+      // Get the file from storage
+      const { data: fileData } = await supabase.storage
+        .from('audio-files')
+        .download(file.file_url.split('/').pop() || '');
+
+      if (!fileData) {
+        throw new Error('Could not download file');
+      }
+
+      // Create a File object from the blob
+      const audioFile = new File([fileData], file.file_name, {
+        type: 'audio/mpeg'
+      });
+
+      // Update status to transcribing
+      await supabase
+        .from('audio_files')
+        .update({ status: 'transcribing' })
+        .eq('id', file.id);
+
+      // Update UI to show transcribing
+      setAudioFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, status: 'transcribing' } : f
+      ));
+
+      // Start transcription
+      const response = await fetch(`${API_BASE_URL}/api/transcribe`, {
+        method: 'POST',
+        body: (() => {
+          const formData = new FormData();
+          formData.append('file', audioFile, 'audio.mp3');
+          return formData;
+        })()
+      });
+
+      if (!response.ok) {
+        throw new Error(`Transcription failed: ${response.statusText}`);
+      }
+
+      const transcriptionResult = await response.json();
+
+      // Update status to summarizing
+      await supabase
+        .from('audio_files')
+        .update({
+          transcription: transcriptionResult.segments,
+          status: 'summarizing'
+        })
+        .eq('id', file.id);
+
+      // Update UI to show summarizing
+      setAudioFiles(prev => prev.map(f => 
+        f.id === file.id ? { 
+          ...f, 
+          status: 'summarizing',
+          transcription: transcriptionResult.segments 
+        } : f
+      ));
+
+      // Get key events
+      const eventsResponse = await fetch(`${API_BASE_URL}/api/analyze-events`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ segments: transcriptionResult.segments }),
+      });
+
+      if (!eventsResponse.ok) {
+        throw new Error(`Events analysis failed: ${eventsResponse.statusText}`);
+      }
+
+      const eventsResult = await eventsResponse.json();
+
+      // Get summary
+      const summaryResponse = await fetch(`${API_BASE_URL}/api/summarize-conversation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ segments: transcriptionResult.segments }),
+      });
+
+      if (!summaryResponse.ok) {
+        throw new Error(`Summarization failed: ${summaryResponse.statusText}`);
+      }
+
+      const summaryResult = await summaryResponse.json();
+
+      // Update final data in database
+      await supabase
+        .from('audio_files')
+        .update({
+          transcription: transcriptionResult.segments,
+          key_events: eventsResult.key_events,
+          summary: summaryResult.summary,
+          status: 'ready'
+        })
+        .eq('id', file.id);
+
+      // Update UI with final data
+      setAudioFiles(prev => prev.map(f => 
+        f.id === file.id ? {
+          ...f,
+          status: 'ready',
+          transcription: transcriptionResult.segments,
+          key_events: eventsResult.key_events,
+          summary: summaryResult.summary
+        } : f
+      ));
+
+    } catch (error) {
+      console.error('Reprocess error:', error);
+      
+      // Update status to failed
+      await supabase
+        .from('audio_files')
+        .update({ status: 'failed' })
+        .eq('id', file.id);
+
+      // Update UI to show failed status
+      setAudioFiles(prev => prev.map(f => 
+        f.id === file.id ? { ...f, status: 'failed' } : f
+      ));
+
+      throw error;
+    }
+  };
+
   // Initial load
   useEffect(() => {
     refreshFiles();
@@ -188,6 +333,7 @@ export function useAudioFiles() {
     refreshFiles,
     deleteFile,
     deleteAllFiles,
-    deletingFiles
+    deletingFiles,
+    reprocessFile
   };
 } 
