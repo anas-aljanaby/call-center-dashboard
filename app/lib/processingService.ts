@@ -1,5 +1,6 @@
 import { ProcessingSettings } from '../contexts/SettingsContext';
 import { API_BASE_URL } from '../config/api';
+import { Segment } from '../types/audio';
 
 export async function transcribeWithSettings(
   file: File, 
@@ -13,7 +14,7 @@ export async function transcribeWithSettings(
   console.log('Sending request to transcribe');
   console.log('Settings:', settings);
   console.log('FormData entries:');
-  for (let pair of formData.entries()) {
+  for (const pair of formData.entries()) {
     console.log(pair[0], pair[1]);
   }
 
@@ -26,7 +27,7 @@ export async function transcribeWithSettings(
 }
 
 export async function analyzeEventsWithSettings(
-  segments: any[],
+  segments: Segment[],
   settings: ProcessingSettings
 ) {
   const response = await fetch(`${API_BASE_URL}/api/analyze-events`, {
@@ -42,7 +43,7 @@ export async function analyzeEventsWithSettings(
 }
 
 export async function summarizeWithSettings(
-  segments: any[],
+  segments: Segment[],
   settings: ProcessingSettings
 ) {
   const response = await fetch(`${API_BASE_URL}/api/summarize-conversation`, {
