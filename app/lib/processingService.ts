@@ -8,7 +8,7 @@ export async function transcribeWithSettings(
 ) {
   const formData = new FormData();
   formData.append('file', file);
-  formData.append('settings', JSON.stringify(settings));
+  formData.append('settings', JSON.stringify(settings)); 
 
   // Log the actual contents of formData
   console.log('Sending request to transcribe');

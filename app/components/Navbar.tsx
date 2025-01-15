@@ -31,9 +31,10 @@ const Navbar = () => {
           
           {/* Navigation Items */}
           <div className="flex items-center space-x-4">
-            <NavItem icon={<BiSpreadsheet />} text="Scorecard" />
-            <NavItem icon={<BiHeadphone />} text="Interactions" />
+            {/* <NavItem icon={<BiSpreadsheet />} text="Scorecard" />
+            <NavItem icon={<BiHeadphone />} text="Interactions" /> */}
             <NavItem icon={<BiBarChartAlt2 />} text="Leaderboard" />
+            <NavItem icon={<BiHeadphone />} text="Knowledge AI" /> 
             <NavItem 
               icon={<BiData />} 
               text="Analyze"  
