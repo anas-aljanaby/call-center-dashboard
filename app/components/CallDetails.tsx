@@ -16,7 +16,7 @@ interface CallInfo {
 }
 
 const dummyCallInfo: CallInfo = {
-  agentEmail: "mia.thompson@observe.ai",
+  agentEmail: "mia.thompson@example.com",
   agentName: "Mia Thompson",
   agentTeam: "Outbound Sales",
   audioFileName: "sales10.mp3",
