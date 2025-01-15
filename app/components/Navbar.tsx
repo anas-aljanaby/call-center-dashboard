@@ -24,15 +24,12 @@ const Navbar = () => {
         <div className="flex items-center space-x-8">
           {/* Logo/Brand */}
           <div className="flex items-center space-x-2">
-            {/* <BiHeadphone className="w-6 h-6 text-blue-600" /> */}
             <BrainCircuit size={24} className="w-6 h-6 text-blue-600" />
             <span className="font-semibold text-gray-800">Call Center</span>
           </div>
           
           {/* Navigation Items */}
           <div className="flex items-center space-x-4">
-            {/* <NavItem icon={<BiSpreadsheet />} text="Scorecard" />
-            <NavItem icon={<BiHeadphone />} text="Interactions" /> */}
             <NavItem icon={<BiBarChartAlt2 />} text="Leaderboard" />
             <NavItem icon={<BiHeadphone />} text="Knowledge AI" /> 
             <NavItem 

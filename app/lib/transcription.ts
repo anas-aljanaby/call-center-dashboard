@@ -75,7 +75,7 @@ export async function summarizeTranscription(
     try {
       onProgress?.('pending');
   
-      const response = await fetch('http://localhost:8000/api/summarize-conversation', {
+      const response = await fetch(`${API_BASE_URL}/api/summarize-conversation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
